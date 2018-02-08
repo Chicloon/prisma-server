@@ -436,6 +436,7 @@ input UserWhereInput {
 input UserWhereUniqueInput {
   id: ID
   email: String
+  name: String
 }
 `
 
@@ -721,6 +722,7 @@ export interface PostUpdateWithoutAuthorDataInput {
 export interface UserWhereUniqueInput {
   id?: ID_Input
   email?: String
+  name?: String
 }
 
 export interface PostSubscriptionWhereInput {
