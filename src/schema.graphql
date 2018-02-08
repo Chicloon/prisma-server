@@ -5,6 +5,7 @@ type Query {
   drafts: [Post!]!
   post(id: ID!): Post!
   me: User
+  animals: [Animal!]!
 }
 
 type Mutation {
@@ -13,6 +14,7 @@ type Mutation {
   createDraft(title: String!, text: String!): Post!
   publish(id: ID!): Post!
   deletePost(id: ID!): Post!
+  createAnimal(name: String!, tail: Boolean!, legs: Int!): Animal
 }
 
 type AuthPayload {

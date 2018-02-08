@@ -15,3 +15,10 @@ type User {
   name: String! @unique
   posts: [Post!]!
 }
+
+type Animal {
+  id: ID! @unique
+  name: String! @unique
+  tail: Boolean!
+  legs: Int!
+}

@@ -9,6 +9,13 @@ const typeDefs = `
 # Model Types
 #
 
+type Animal implements Node {
+  id: ID!
+  name: String!
+  tail: Boolean!
+  legs: Int!
+}
+
 type Post implements Node {
   id: ID!
   createdAt: DateTime!
@@ -32,12 +39,126 @@ type User implements Node {
 # Other Types
 #
 
+type AggregateAnimal {
+  count: Int!
+}
+
 type AggregatePost {
   count: Int!
 }
 
 type AggregateUser {
   count: Int!
+}
+
+type AnimalConnection {
+  pageInfo: PageInfo!
+  edges: [AnimalEdge]!
+  aggregate: AggregateAnimal!
+}
+
+input AnimalCreateInput {
+  name: String!
+  tail: Boolean!
+  legs: Int!
+}
+
+type AnimalEdge {
+  node: Animal!
+  cursor: String!
+}
+
+enum AnimalOrderByInput {
+  id_ASC
+  id_DESC
+  name_ASC
+  name_DESC
+  tail_ASC
+  tail_DESC
+  legs_ASC
+  legs_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type AnimalPreviousValues {
+  id: ID!
+  name: String!
+  tail: Boolean!
+  legs: Int!
+}
+
+type AnimalSubscriptionPayload {
+  mutation: MutationType!
+  node: Animal
+  updatedFields: [String!]
+  previousValues: AnimalPreviousValues
+}
+
+input AnimalSubscriptionWhereInput {
+  AND: [AnimalSubscriptionWhereInput!]
+  OR: [AnimalSubscriptionWhereInput!]
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: AnimalWhereInput
+}
+
+input AnimalUpdateInput {
+  name: String
+  tail: Boolean
+  legs: Int
+}
+
+input AnimalWhereInput {
+  AND: [AnimalWhereInput!]
+  OR: [AnimalWhereInput!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  tail: Boolean
+  tail_not: Boolean
+  legs: Int
+  legs_not: Int
+  legs_in: [Int!]
+  legs_not_in: [Int!]
+  legs_lt: Int
+  legs_lte: Int
+  legs_gt: Int
+  legs_gte: Int
+}
+
+input AnimalWhereUniqueInput {
+  id: ID
+  name: String
 }
 
 type BatchPayload {
@@ -51,16 +172,22 @@ scalar Long
 type Mutation {
   createPost(data: PostCreateInput!): Post!
   createUser(data: UserCreateInput!): User!
+  createAnimal(data: AnimalCreateInput!): Animal!
   updatePost(data: PostUpdateInput!, where: PostWhereUniqueInput!): Post
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  updateAnimal(data: AnimalUpdateInput!, where: AnimalWhereUniqueInput!): Animal
   deletePost(where: PostWhereUniqueInput!): Post
   deleteUser(where: UserWhereUniqueInput!): User
+  deleteAnimal(where: AnimalWhereUniqueInput!): Animal
   upsertPost(where: PostWhereUniqueInput!, create: PostCreateInput!, update: PostUpdateInput!): Post!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
+  upsertAnimal(where: AnimalWhereUniqueInput!, create: AnimalCreateInput!, update: AnimalUpdateInput!): Animal!
   updateManyPosts(data: PostUpdateInput!, where: PostWhereInput!): BatchPayload!
   updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
+  updateManyAnimals(data: AnimalUpdateInput!, where: AnimalWhereInput!): BatchPayload!
   deleteManyPosts(where: PostWhereInput!): BatchPayload!
   deleteManyUsers(where: UserWhereInput!): BatchPayload!
+  deleteManyAnimals(where: AnimalWhereInput!): BatchPayload!
 }
 
 enum MutationType {
@@ -256,16 +383,20 @@ input PostWhereUniqueInput {
 type Query {
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
+  animals(where: AnimalWhereInput, orderBy: AnimalOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Animal]!
   post(where: PostWhereUniqueInput!): Post
   user(where: UserWhereUniqueInput!): User
+  animal(where: AnimalWhereUniqueInput!): Animal
   postsConnection(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PostConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
+  animalsConnection(where: AnimalWhereInput, orderBy: AnimalOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): AnimalConnection!
   node(id: ID!): Node
 }
 
 type Subscription {
   post(where: PostSubscriptionWhereInput): PostSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
+  animal(where: AnimalSubscriptionWhereInput): AnimalSubscriptionPayload
 }
 
 type UserConnection {
@@ -468,15 +599,28 @@ export type UserOrderByInput =
   'createdAt_ASC' |
   'createdAt_DESC'
 
+export type AnimalOrderByInput = 
+  'id_ASC' |
+  'id_DESC' |
+  'name_ASC' |
+  'name_DESC' |
+  'tail_ASC' |
+  'tail_DESC' |
+  'legs_ASC' |
+  'legs_DESC' |
+  'updatedAt_ASC' |
+  'updatedAt_DESC' |
+  'createdAt_ASC' |
+  'createdAt_DESC'
+
 export type MutationType = 
   'CREATED' |
   'UPDATED' |
   'DELETED'
 
-export interface UserCreateWithoutPostsInput {
-  email: String
-  password: String
-  name: String
+export interface UserCreateOneWithoutPostsInput {
+  create?: UserCreateWithoutPostsInput
+  connect?: UserWhereUniqueInput
 }
 
 export interface PostWhereInput {
@@ -623,11 +767,10 @@ export interface PostUpdateManyWithoutAuthorInput {
   upsert?: PostUpsertWithoutAuthorInput[] | PostUpsertWithoutAuthorInput
 }
 
-export interface PostUpdateInput {
+export interface PostCreateWithoutAuthorInput {
   isPublished?: Boolean
-  title?: String
-  text?: String
-  author?: UserUpdateOneWithoutPostsInput
+  title: String
+  text: String
 }
 
 export interface UserUpdateInput {
@@ -635,18 +778,6 @@ export interface UserUpdateInput {
   password?: String
   name?: String
   posts?: PostUpdateManyWithoutAuthorInput
-}
-
-export interface PostCreateWithoutAuthorInput {
-  isPublished?: Boolean
-  title: String
-  text: String
-}
-
-export interface UserUpsertWithoutPostsInput {
-  where: UserWhereUniqueInput
-  update: UserUpdateWithoutPostsDataInput
-  create: UserCreateWithoutPostsInput
 }
 
 export interface UserSubscriptionWhereInput {
@@ -659,70 +790,10 @@ export interface UserSubscriptionWhereInput {
   node?: UserWhereInput
 }
 
-export interface UserUpdateWithoutPostsDataInput {
-  email?: String
-  password?: String
-  name?: String
-}
-
-export interface PostWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface PostCreateInput {
-  isPublished?: Boolean
-  title: String
-  text: String
-  author: UserCreateOneWithoutPostsInput
-}
-
-export interface PostUpsertWithoutAuthorInput {
-  where: PostWhereUniqueInput
-  update: PostUpdateWithoutAuthorDataInput
-  create: PostCreateWithoutAuthorInput
-}
-
-export interface PostUpdateWithoutAuthorInput {
-  where: PostWhereUniqueInput
-  data: PostUpdateWithoutAuthorDataInput
-}
-
-export interface UserUpdateOneWithoutPostsInput {
-  create?: UserCreateWithoutPostsInput
-  connect?: UserWhereUniqueInput
-  disconnect?: UserWhereUniqueInput
-  delete?: UserWhereUniqueInput
-  update?: UserUpdateWithoutPostsInput
-  upsert?: UserUpsertWithoutPostsInput
-}
-
-export interface UserCreateInput {
-  email: String
-  password: String
-  name: String
-  posts?: PostCreateManyWithoutAuthorInput
-}
-
-export interface UserUpdateWithoutPostsInput {
+export interface UserUpsertWithoutPostsInput {
   where: UserWhereUniqueInput
-  data: UserUpdateWithoutPostsDataInput
-}
-
-export interface UserCreateOneWithoutPostsInput {
-  create?: UserCreateWithoutPostsInput
-  connect?: UserWhereUniqueInput
-}
-
-export interface PostUpdateWithoutAuthorDataInput {
-  isPublished?: Boolean
-  title?: String
-  text?: String
-}
-
-export interface UserWhereUniqueInput {
-  id?: ID_Input
-  email?: String
-  name?: String
+  update: UserUpdateWithoutPostsDataInput
+  create: UserCreateWithoutPostsInput
 }
 
 export interface PostSubscriptionWhereInput {
@@ -735,21 +806,166 @@ export interface PostSubscriptionWhereInput {
   node?: PostWhereInput
 }
 
-export interface Node {
-  id: ID_Output
+export interface UserUpdateWithoutPostsDataInput {
+  email?: String
+  password?: String
+  name?: String
 }
 
-export interface UserPreviousValues {
-  id: ID_Output
+export interface PostWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface UserUpdateWithoutPostsInput {
+  where: UserWhereUniqueInput
+  data: UserUpdateWithoutPostsDataInput
+}
+
+export interface AnimalWhereUniqueInput {
+  id?: ID_Input
+  name?: String
+}
+
+export interface UserUpdateOneWithoutPostsInput {
+  create?: UserCreateWithoutPostsInput
+  connect?: UserWhereUniqueInput
+  disconnect?: UserWhereUniqueInput
+  delete?: UserWhereUniqueInput
+  update?: UserUpdateWithoutPostsInput
+  upsert?: UserUpsertWithoutPostsInput
+}
+
+export interface PostUpdateWithoutAuthorDataInput {
+  isPublished?: Boolean
+  title?: String
+  text?: String
+}
+
+export interface PostUpdateInput {
+  isPublished?: Boolean
+  title?: String
+  text?: String
+  author?: UserUpdateOneWithoutPostsInput
+}
+
+export interface AnimalSubscriptionWhereInput {
+  AND?: AnimalSubscriptionWhereInput[] | AnimalSubscriptionWhereInput
+  OR?: AnimalSubscriptionWhereInput[] | AnimalSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: AnimalWhereInput
+}
+
+export interface UserCreateInput {
+  email: String
+  password: String
+  name: String
+  posts?: PostCreateManyWithoutAuthorInput
+}
+
+export interface UserCreateWithoutPostsInput {
   email: String
   password: String
   name: String
 }
 
-export interface PostConnection {
-  pageInfo: PageInfo
-  edges: PostEdge[]
-  aggregate: AggregatePost
+export interface AnimalCreateInput {
+  name: String
+  tail: Boolean
+  legs: Int
+}
+
+export interface PostCreateInput {
+  isPublished?: Boolean
+  title: String
+  text: String
+  author: UserCreateOneWithoutPostsInput
+}
+
+export interface AnimalWhereInput {
+  AND?: AnimalWhereInput[] | AnimalWhereInput
+  OR?: AnimalWhereInput[] | AnimalWhereInput
+  id?: ID_Input
+  id_not?: ID_Input
+  id_in?: ID_Input[] | ID_Input
+  id_not_in?: ID_Input[] | ID_Input
+  id_lt?: ID_Input
+  id_lte?: ID_Input
+  id_gt?: ID_Input
+  id_gte?: ID_Input
+  id_contains?: ID_Input
+  id_not_contains?: ID_Input
+  id_starts_with?: ID_Input
+  id_not_starts_with?: ID_Input
+  id_ends_with?: ID_Input
+  id_not_ends_with?: ID_Input
+  name?: String
+  name_not?: String
+  name_in?: String[] | String
+  name_not_in?: String[] | String
+  name_lt?: String
+  name_lte?: String
+  name_gt?: String
+  name_gte?: String
+  name_contains?: String
+  name_not_contains?: String
+  name_starts_with?: String
+  name_not_starts_with?: String
+  name_ends_with?: String
+  name_not_ends_with?: String
+  tail?: Boolean
+  tail_not?: Boolean
+  legs?: Int
+  legs_not?: Int
+  legs_in?: Int[] | Int
+  legs_not_in?: Int[] | Int
+  legs_lt?: Int
+  legs_lte?: Int
+  legs_gt?: Int
+  legs_gte?: Int
+}
+
+export interface PostUpdateWithoutAuthorInput {
+  where: PostWhereUniqueInput
+  data: PostUpdateWithoutAuthorDataInput
+}
+
+export interface PostUpsertWithoutAuthorInput {
+  where: PostWhereUniqueInput
+  update: PostUpdateWithoutAuthorDataInput
+  create: PostCreateWithoutAuthorInput
+}
+
+export interface UserWhereUniqueInput {
+  id?: ID_Input
+  email?: String
+  name?: String
+}
+
+export interface AnimalUpdateInput {
+  name?: String
+  tail?: Boolean
+  legs?: Int
+}
+
+export interface Node {
+  id: ID_Output
+}
+
+export interface AnimalPreviousValues {
+  id: ID_Output
+  name: String
+  tail: Boolean
+  legs: Int
+}
+
+export interface Animal extends Node {
+  id: ID_Output
+  name: String
+  tail: Boolean
+  legs: Int
 }
 
 export interface Post extends Node {
@@ -762,22 +978,52 @@ export interface Post extends Node {
   author: User
 }
 
-export interface PageInfo {
-  hasNextPage: Boolean
-  hasPreviousPage: Boolean
-  startCursor?: String
-  endCursor?: String
-}
-
-export interface PostSubscriptionPayload {
-  mutation: MutationType
-  node?: Post
-  updatedFields?: String[]
-  previousValues?: PostPreviousValues
-}
-
 export interface BatchPayload {
   count: Long
+}
+
+export interface AggregateAnimal {
+  count: Int
+}
+
+export interface AnimalSubscriptionPayload {
+  mutation: MutationType
+  node?: Animal
+  updatedFields?: String[]
+  previousValues?: AnimalPreviousValues
+}
+
+export interface UserSubscriptionPayload {
+  mutation: MutationType
+  node?: User
+  updatedFields?: String[]
+  previousValues?: UserPreviousValues
+}
+
+export interface AnimalEdge {
+  node: Animal
+  cursor: String
+}
+
+export interface AnimalConnection {
+  pageInfo: PageInfo
+  edges: AnimalEdge[]
+  aggregate: AggregateAnimal
+}
+
+export interface AggregateUser {
+  count: Int
+}
+
+export interface UserConnection {
+  pageInfo: PageInfo
+  edges: UserEdge[]
+  aggregate: AggregateUser
+}
+
+export interface PostEdge {
+  node: Post
+  cursor: String
 }
 
 export interface PostPreviousValues {
@@ -789,6 +1035,20 @@ export interface PostPreviousValues {
   text: String
 }
 
+export interface PostSubscriptionPayload {
+  mutation: MutationType
+  node?: Post
+  updatedFields?: String[]
+  previousValues?: PostPreviousValues
+}
+
+export interface UserPreviousValues {
+  id: ID_Output
+  email: String
+  password: String
+  name: String
+}
+
 export interface User extends Node {
   id: ID_Output
   email: String
@@ -797,15 +1057,15 @@ export interface User extends Node {
   posts?: Post[]
 }
 
-export interface AggregateUser {
-  count: Int
+export interface PageInfo {
+  hasNextPage: Boolean
+  hasPreviousPage: Boolean
+  startCursor?: String
+  endCursor?: String
 }
 
-export interface UserSubscriptionPayload {
-  mutation: MutationType
-  node?: User
-  updatedFields?: String[]
-  previousValues?: UserPreviousValues
+export interface AggregatePost {
+  count: Int
 }
 
 export interface UserEdge {
@@ -813,20 +1073,13 @@ export interface UserEdge {
   cursor: String
 }
 
-export interface PostEdge {
-  node: Post
-  cursor: String
-}
-
-export interface AggregatePost {
-  count: Int
-}
-
-export interface UserConnection {
+export interface PostConnection {
   pageInfo: PageInfo
-  edges: UserEdge[]
-  aggregate: AggregateUser
+  edges: PostEdge[]
+  aggregate: AggregatePost
 }
+
+export type Long = string
 
 /*
 The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1. 
@@ -840,18 +1093,16 @@ export type ID_Input = string | number
 export type ID_Output = string
 
 /*
-The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
-*/
-export type String = string
-
-export type Long = string
-
-/*
 The `Boolean` scalar type represents `true` or `false`.
 */
 export type Boolean = boolean
 
 export type DateTime = string
+
+/*
+The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+*/
+export type String = string
 
 export interface Schema {
   query: Query
@@ -862,31 +1113,41 @@ export interface Schema {
 export type Query = {
   posts: (args: { where?: PostWhereInput, orderBy?: PostOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Post[]>
   users: (args: { where?: UserWhereInput, orderBy?: UserOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<User[]>
+  animals: (args: { where?: AnimalWhereInput, orderBy?: AnimalOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<Animal[]>
   post: (args: { where: PostWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Post | null>
   user: (args: { where: UserWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<User | null>
+  animal: (args: { where: AnimalWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Animal | null>
   postsConnection: (args: { where?: PostWhereInput, orderBy?: PostOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<PostConnection>
   usersConnection: (args: { where?: UserWhereInput, orderBy?: UserOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<UserConnection>
+  animalsConnection: (args: { where?: AnimalWhereInput, orderBy?: AnimalOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<AnimalConnection>
   node: (args: { id: ID_Output }, info?: GraphQLResolveInfo | string) => Promise<Node | null>
 }
 
 export type Mutation = {
   createPost: (args: { data: PostCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Post>
   createUser: (args: { data: UserCreateInput }, info?: GraphQLResolveInfo | string) => Promise<User>
+  createAnimal: (args: { data: AnimalCreateInput }, info?: GraphQLResolveInfo | string) => Promise<Animal>
   updatePost: (args: { data: PostUpdateInput, where: PostWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Post | null>
   updateUser: (args: { data: UserUpdateInput, where: UserWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<User | null>
+  updateAnimal: (args: { data: AnimalUpdateInput, where: AnimalWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Animal | null>
   deletePost: (args: { where: PostWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Post | null>
   deleteUser: (args: { where: UserWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<User | null>
+  deleteAnimal: (args: { where: AnimalWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Animal | null>
   upsertPost: (args: { where: PostWhereUniqueInput, create: PostCreateInput, update: PostUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Post>
   upsertUser: (args: { where: UserWhereUniqueInput, create: UserCreateInput, update: UserUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<User>
+  upsertAnimal: (args: { where: AnimalWhereUniqueInput, create: AnimalCreateInput, update: AnimalUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Animal>
   updateManyPosts: (args: { data: PostUpdateInput, where: PostWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   updateManyUsers: (args: { data: UserUpdateInput, where: UserWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
+  updateManyAnimals: (args: { data: AnimalUpdateInput, where: AnimalWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   deleteManyPosts: (args: { where: PostWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   deleteManyUsers: (args: { where: UserWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
+  deleteManyAnimals: (args: { where: AnimalWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
 }
 
 export type Subscription = {
   post: (args: { where?: PostSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<PostSubscriptionPayload>>
   user: (args: { where?: UserSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<UserSubscriptionPayload>>
+  animal: (args: { where?: AnimalSubscriptionWhereInput }, infoOrQuery?: GraphQLResolveInfo | string) => Promise<AsyncIterator<AnimalSubscriptionPayload>>
 }
 
 export class Prisma extends BasePrisma {
@@ -897,36 +1158,47 @@ export class Prisma extends BasePrisma {
 
   exists = {
     Post: (where: PostWhereInput): Promise<boolean> => super.existsDelegate('query', 'posts', { where }, {}, '{ id }'),
-    User: (where: UserWhereInput): Promise<boolean> => super.existsDelegate('query', 'users', { where }, {}, '{ id }')
+    User: (where: UserWhereInput): Promise<boolean> => super.existsDelegate('query', 'users', { where }, {}, '{ id }'),
+    Animal: (where: AnimalWhereInput): Promise<boolean> => super.existsDelegate('query', 'animals', { where }, {}, '{ id }')
   }
 
   query: Query = {
     posts: (args, info): Promise<Post[]> => super.delegate('query', 'posts', args, {}, info),
     users: (args, info): Promise<User[]> => super.delegate('query', 'users', args, {}, info),
+    animals: (args, info): Promise<Animal[]> => super.delegate('query', 'animals', args, {}, info),
     post: (args, info): Promise<Post | null> => super.delegate('query', 'post', args, {}, info),
     user: (args, info): Promise<User | null> => super.delegate('query', 'user', args, {}, info),
+    animal: (args, info): Promise<Animal | null> => super.delegate('query', 'animal', args, {}, info),
     postsConnection: (args, info): Promise<PostConnection> => super.delegate('query', 'postsConnection', args, {}, info),
     usersConnection: (args, info): Promise<UserConnection> => super.delegate('query', 'usersConnection', args, {}, info),
+    animalsConnection: (args, info): Promise<AnimalConnection> => super.delegate('query', 'animalsConnection', args, {}, info),
     node: (args, info): Promise<Node | null> => super.delegate('query', 'node', args, {}, info)
   }
 
   mutation: Mutation = {
     createPost: (args, info): Promise<Post> => super.delegate('mutation', 'createPost', args, {}, info),
     createUser: (args, info): Promise<User> => super.delegate('mutation', 'createUser', args, {}, info),
+    createAnimal: (args, info): Promise<Animal> => super.delegate('mutation', 'createAnimal', args, {}, info),
     updatePost: (args, info): Promise<Post | null> => super.delegate('mutation', 'updatePost', args, {}, info),
     updateUser: (args, info): Promise<User | null> => super.delegate('mutation', 'updateUser', args, {}, info),
+    updateAnimal: (args, info): Promise<Animal | null> => super.delegate('mutation', 'updateAnimal', args, {}, info),
     deletePost: (args, info): Promise<Post | null> => super.delegate('mutation', 'deletePost', args, {}, info),
     deleteUser: (args, info): Promise<User | null> => super.delegate('mutation', 'deleteUser', args, {}, info),
+    deleteAnimal: (args, info): Promise<Animal | null> => super.delegate('mutation', 'deleteAnimal', args, {}, info),
     upsertPost: (args, info): Promise<Post> => super.delegate('mutation', 'upsertPost', args, {}, info),
     upsertUser: (args, info): Promise<User> => super.delegate('mutation', 'upsertUser', args, {}, info),
+    upsertAnimal: (args, info): Promise<Animal> => super.delegate('mutation', 'upsertAnimal', args, {}, info),
     updateManyPosts: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyPosts', args, {}, info),
     updateManyUsers: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyUsers', args, {}, info),
+    updateManyAnimals: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyAnimals', args, {}, info),
     deleteManyPosts: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyPosts', args, {}, info),
-    deleteManyUsers: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyUsers', args, {}, info)
+    deleteManyUsers: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyUsers', args, {}, info),
+    deleteManyAnimals: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'deleteManyAnimals', args, {}, info)
   }
 
   subscription: Subscription = {
     post: (args, infoOrQuery): Promise<AsyncIterator<PostSubscriptionPayload>> => super.delegateSubscription('post', args, {}, infoOrQuery),
-    user: (args, infoOrQuery): Promise<AsyncIterator<UserSubscriptionPayload>> => super.delegateSubscription('user', args, {}, infoOrQuery)
+    user: (args, infoOrQuery): Promise<AsyncIterator<UserSubscriptionPayload>> => super.delegateSubscription('user', args, {}, infoOrQuery),
+    animal: (args, infoOrQuery): Promise<AsyncIterator<AnimalSubscriptionPayload>> => super.delegateSubscription('animal', args, {}, infoOrQuery)
   }
 }

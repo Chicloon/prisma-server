@@ -11,7 +11,7 @@ export const auth = {
     // .catch(error => {
     //   // console.log(error);
     // });
-
+    
     return {
       token: jwt.sign({ userId: user.id }, process.env.APP_SECRET),
       user
