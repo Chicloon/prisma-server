@@ -1,4 +1,6 @@
 # import Post from "./generated/prisma.graphql"
+# import Channel from "./generated/prisma.graphql"
+# import Animal from "./generated/prisma.graphql"
 
 type Query {
   feed: [Post!]!
@@ -6,6 +8,8 @@ type Query {
   post(id: ID!): Post!
   me: User
   animals: [Animal!]!
+  user(id: ID!): User!
+  channels: [Channel!]!
 }
 
 type Mutation {
@@ -15,6 +19,7 @@ type Mutation {
   publish(id: ID!): Post!
   deletePost(id: ID!): Post!
   createAnimal(name: String!, tail: Boolean!, legs: Int!): Animal
+  createChannel(name: String!): Channel
 }
 
 type AuthPayload {
@@ -27,4 +32,5 @@ type User {
   email: String!
   name: String!
   posts: [Post!]!
+  animals: [Animal!]!
 }

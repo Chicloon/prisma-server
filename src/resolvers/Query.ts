@@ -1,6 +1,12 @@
 import { getUserId, Context } from "../utils";
 
 export const Query = {
+  channels(parent, { id }, ctx: Context, info) {
+    return ctx.db.query.channels({}, info);
+  },
+  user(parent, { id }, ctx: Context, info) {
+    return ctx.db.query.user({ where: { id } }, info);
+  },
   feed(parent, args, ctx: Context, info) {
     return ctx.db.query.posts({ where: { isPublished: true } }, info);
   },

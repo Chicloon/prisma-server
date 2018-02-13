@@ -2,6 +2,7 @@ import { Query } from "./Query";
 import { auth } from "./Mutation/auth";
 import { post } from "./Mutation/post";
 import { animal } from "./Mutation/animal";
+import { channel } from "./Mutation/channel";
 import { AuthPayload } from "./AuthPayload";
 
 export default {
@@ -9,7 +10,8 @@ export default {
   Mutation: {
     ...auth,
     ...post,
-    ...animal
+    ...animal,
+    ...channel
   },
   AuthPayload
 };

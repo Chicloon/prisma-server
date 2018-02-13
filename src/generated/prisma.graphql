@@ -10,6 +10,14 @@ type Animal implements Node {
   name: String!
   tail: Boolean!
   legs: Int!
+  owners(where: UserWhereInput): User!
+}
+
+type Channel implements Node {
+  id: ID!
+  name: String!
+  owner(where: UserWhereInput): User!
+  members(where: ChannelMemberWhereInput, orderBy: ChannelMemberOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ChannelMember!]
 }
 
 type Post implements Node {
@@ -28,6 +36,7 @@ type User implements Node {
   password: String!
   name: String!
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
+  animals(where: AnimalWhereInput, orderBy: AnimalOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Animal!]
 }
 
 
@@ -36,6 +45,14 @@ type User implements Node {
 #
 
 type AggregateAnimal {
+  count: Int!
+}
+
+type AggregateChannel {
+  count: Int!
+}
+
+type AggregateChannelMember {
   count: Int!
 }
 
@@ -54,6 +71,18 @@ type AnimalConnection {
 }
 
 input AnimalCreateInput {
+  name: String!
+  tail: Boolean!
+  legs: Int!
+  owners: UserCreateOneWithoutAnimalsInput!
+}
+
+input AnimalCreateManyWithoutOwnersInput {
+  create: [AnimalCreateWithoutOwnersInput!]
+  connect: [AnimalWhereUniqueInput!]
+}
+
+input AnimalCreateWithoutOwnersInput {
   name: String!
   tail: Boolean!
   legs: Int!
@@ -107,6 +136,33 @@ input AnimalUpdateInput {
   name: String
   tail: Boolean
   legs: Int
+  owners: UserUpdateOneWithoutAnimalsInput
+}
+
+input AnimalUpdateManyWithoutOwnersInput {
+  create: [AnimalCreateWithoutOwnersInput!]
+  connect: [AnimalWhereUniqueInput!]
+  disconnect: [AnimalWhereUniqueInput!]
+  delete: [AnimalWhereUniqueInput!]
+  update: [AnimalUpdateWithoutOwnersInput!]
+  upsert: [AnimalUpsertWithoutOwnersInput!]
+}
+
+input AnimalUpdateWithoutOwnersDataInput {
+  name: String
+  tail: Boolean
+  legs: Int
+}
+
+input AnimalUpdateWithoutOwnersInput {
+  where: AnimalWhereUniqueInput!
+  data: AnimalUpdateWithoutOwnersDataInput!
+}
+
+input AnimalUpsertWithoutOwnersInput {
+  where: AnimalWhereUniqueInput!
+  update: AnimalUpdateWithoutOwnersDataInput!
+  create: AnimalCreateWithoutOwnersInput!
 }
 
 input AnimalWhereInput {
@@ -150,6 +206,7 @@ input AnimalWhereInput {
   legs_lte: Int
   legs_gt: Int
   legs_gte: Int
+  owners: UserWhereInput
 }
 
 input AnimalWhereUniqueInput {
@@ -161,6 +218,233 @@ type BatchPayload {
   count: Long!
 }
 
+type ChannelConnection {
+  pageInfo: PageInfo!
+  edges: [ChannelEdge]!
+  aggregate: AggregateChannel!
+}
+
+input ChannelCreateInput {
+  name: String!
+  owner: UserCreateOneInput!
+  members: ChannelMemberCreateManyWithoutChannelInput
+}
+
+input ChannelCreateOneWithoutMembersInput {
+  create: ChannelCreateWithoutMembersInput
+  connect: ChannelWhereUniqueInput
+}
+
+input ChannelCreateWithoutMembersInput {
+  name: String!
+  owner: UserCreateOneInput!
+}
+
+type ChannelEdge {
+  node: Channel!
+  cursor: String!
+}
+
+type ChannelMember {
+  name(where: UserWhereInput): User!
+  channel(where: ChannelWhereInput): Channel!
+  role: String!
+}
+
+type ChannelMemberConnection {
+  pageInfo: PageInfo!
+  edges: [ChannelMemberEdge]!
+  aggregate: AggregateChannelMember!
+}
+
+input ChannelMemberCreateInput {
+  role: String!
+  name: UserCreateOneInput!
+  channel: ChannelCreateOneWithoutMembersInput!
+}
+
+input ChannelMemberCreateManyWithoutChannelInput {
+  create: [ChannelMemberCreateWithoutChannelInput!]
+}
+
+input ChannelMemberCreateWithoutChannelInput {
+  role: String!
+  name: UserCreateOneInput!
+}
+
+type ChannelMemberEdge {
+  node: ChannelMember!
+  cursor: String!
+}
+
+enum ChannelMemberOrderByInput {
+  role_ASC
+  role_DESC
+  id_ASC
+  id_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type ChannelMemberPreviousValues {
+  role: String!
+}
+
+type ChannelMemberSubscriptionPayload {
+  mutation: MutationType!
+  node: ChannelMember
+  updatedFields: [String!]
+  previousValues: ChannelMemberPreviousValues
+}
+
+input ChannelMemberSubscriptionWhereInput {
+  AND: [ChannelMemberSubscriptionWhereInput!]
+  OR: [ChannelMemberSubscriptionWhereInput!]
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: ChannelMemberWhereInput
+}
+
+input ChannelMemberUpdateInput {
+  role: String
+  name: UserUpdateOneInput
+  channel: ChannelUpdateOneWithoutMembersInput
+}
+
+input ChannelMemberUpdateManyWithoutChannelInput {
+  create: [ChannelMemberCreateWithoutChannelInput!]
+}
+
+input ChannelMemberWhereInput {
+  AND: [ChannelMemberWhereInput!]
+  OR: [ChannelMemberWhereInput!]
+  role: String
+  role_not: String
+  role_in: [String!]
+  role_not_in: [String!]
+  role_lt: String
+  role_lte: String
+  role_gt: String
+  role_gte: String
+  role_contains: String
+  role_not_contains: String
+  role_starts_with: String
+  role_not_starts_with: String
+  role_ends_with: String
+  role_not_ends_with: String
+  name: UserWhereInput
+  channel: ChannelWhereInput
+}
+
+enum ChannelOrderByInput {
+  id_ASC
+  id_DESC
+  name_ASC
+  name_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+  createdAt_ASC
+  createdAt_DESC
+}
+
+type ChannelPreviousValues {
+  id: ID!
+  name: String!
+}
+
+type ChannelSubscriptionPayload {
+  mutation: MutationType!
+  node: Channel
+  updatedFields: [String!]
+  previousValues: ChannelPreviousValues
+}
+
+input ChannelSubscriptionWhereInput {
+  AND: [ChannelSubscriptionWhereInput!]
+  OR: [ChannelSubscriptionWhereInput!]
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: ChannelWhereInput
+}
+
+input ChannelUpdateInput {
+  name: String
+  owner: UserUpdateOneInput
+  members: ChannelMemberUpdateManyWithoutChannelInput
+}
+
+input ChannelUpdateOneWithoutMembersInput {
+  create: ChannelCreateWithoutMembersInput
+  connect: ChannelWhereUniqueInput
+  disconnect: ChannelWhereUniqueInput
+  delete: ChannelWhereUniqueInput
+  update: ChannelUpdateWithoutMembersInput
+  upsert: ChannelUpsertWithoutMembersInput
+}
+
+input ChannelUpdateWithoutMembersDataInput {
+  name: String
+  owner: UserUpdateOneInput
+}
+
+input ChannelUpdateWithoutMembersInput {
+  where: ChannelWhereUniqueInput!
+  data: ChannelUpdateWithoutMembersDataInput!
+}
+
+input ChannelUpsertWithoutMembersInput {
+  where: ChannelWhereUniqueInput!
+  update: ChannelUpdateWithoutMembersDataInput!
+  create: ChannelCreateWithoutMembersInput!
+}
+
+input ChannelWhereInput {
+  AND: [ChannelWhereInput!]
+  OR: [ChannelWhereInput!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  owner: UserWhereInput
+  members_every: ChannelMemberWhereInput
+  members_some: ChannelMemberWhereInput
+  members_none: ChannelMemberWhereInput
+}
+
+input ChannelWhereUniqueInput {
+  id: ID
+}
+
 scalar DateTime
 
 scalar Long
@@ -169,21 +453,30 @@ type Mutation {
   createPost(data: PostCreateInput!): Post!
   createUser(data: UserCreateInput!): User!
   createAnimal(data: AnimalCreateInput!): Animal!
+  createChannel(data: ChannelCreateInput!): Channel!
+  createChannelMember(data: ChannelMemberCreateInput!): ChannelMember!
   updatePost(data: PostUpdateInput!, where: PostWhereUniqueInput!): Post
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateAnimal(data: AnimalUpdateInput!, where: AnimalWhereUniqueInput!): Animal
+  updateChannel(data: ChannelUpdateInput!, where: ChannelWhereUniqueInput!): Channel
   deletePost(where: PostWhereUniqueInput!): Post
   deleteUser(where: UserWhereUniqueInput!): User
   deleteAnimal(where: AnimalWhereUniqueInput!): Animal
+  deleteChannel(where: ChannelWhereUniqueInput!): Channel
   upsertPost(where: PostWhereUniqueInput!, create: PostCreateInput!, update: PostUpdateInput!): Post!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   upsertAnimal(where: AnimalWhereUniqueInput!, create: AnimalCreateInput!, update: AnimalUpdateInput!): Animal!
+  upsertChannel(where: ChannelWhereUniqueInput!, create: ChannelCreateInput!, update: ChannelUpdateInput!): Channel!
   updateManyPosts(data: PostUpdateInput!, where: PostWhereInput!): BatchPayload!
   updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
   updateManyAnimals(data: AnimalUpdateInput!, where: AnimalWhereInput!): BatchPayload!
+  updateManyChannels(data: ChannelUpdateInput!, where: ChannelWhereInput!): BatchPayload!
+  updateManyChannelMembers(data: ChannelMemberUpdateInput!, where: ChannelMemberWhereInput!): BatchPayload!
   deleteManyPosts(where: PostWhereInput!): BatchPayload!
   deleteManyUsers(where: UserWhereInput!): BatchPayload!
   deleteManyAnimals(where: AnimalWhereInput!): BatchPayload!
+  deleteManyChannels(where: ChannelWhereInput!): BatchPayload!
+  deleteManyChannelMembers(where: ChannelMemberWhereInput!): BatchPayload!
 }
 
 enum MutationType {
@@ -380,12 +673,17 @@ type Query {
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post]!
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   animals(where: AnimalWhereInput, orderBy: AnimalOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Animal]!
+  channels(where: ChannelWhereInput, orderBy: ChannelOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Channel]!
+  channelMembers(where: ChannelMemberWhereInput, orderBy: ChannelMemberOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ChannelMember]!
   post(where: PostWhereUniqueInput!): Post
   user(where: UserWhereUniqueInput!): User
   animal(where: AnimalWhereUniqueInput!): Animal
+  channel(where: ChannelWhereUniqueInput!): Channel
   postsConnection(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PostConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   animalsConnection(where: AnimalWhereInput, orderBy: AnimalOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): AnimalConnection!
+  channelsConnection(where: ChannelWhereInput, orderBy: ChannelOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ChannelConnection!
+  channelMembersConnection(where: ChannelMemberWhereInput, orderBy: ChannelMemberOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ChannelMemberConnection!
   node(id: ID!): Node
 }
 
@@ -393,6 +691,8 @@ type Subscription {
   post(where: PostSubscriptionWhereInput): PostSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
   animal(where: AnimalSubscriptionWhereInput): AnimalSubscriptionPayload
+  channel(where: ChannelSubscriptionWhereInput): ChannelSubscriptionPayload
+  channelMember(where: ChannelMemberSubscriptionWhereInput): ChannelMemberSubscriptionPayload
 }
 
 type UserConnection {
@@ -406,6 +706,17 @@ input UserCreateInput {
   password: String!
   name: String!
   posts: PostCreateManyWithoutAuthorInput
+  animals: AnimalCreateManyWithoutOwnersInput
+}
+
+input UserCreateOneInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
+}
+
+input UserCreateOneWithoutAnimalsInput {
+  create: UserCreateWithoutAnimalsInput
+  connect: UserWhereUniqueInput
 }
 
 input UserCreateOneWithoutPostsInput {
@@ -413,10 +724,18 @@ input UserCreateOneWithoutPostsInput {
   connect: UserWhereUniqueInput
 }
 
+input UserCreateWithoutAnimalsInput {
+  email: String!
+  password: String!
+  name: String!
+  posts: PostCreateManyWithoutAuthorInput
+}
+
 input UserCreateWithoutPostsInput {
   email: String!
   password: String!
   name: String!
+  animals: AnimalCreateManyWithoutOwnersInput
 }
 
 type UserEdge {
@@ -468,6 +787,23 @@ input UserUpdateInput {
   password: String
   name: String
   posts: PostUpdateManyWithoutAuthorInput
+  animals: AnimalUpdateManyWithoutOwnersInput
+}
+
+input UserUpdateOneInput {
+  create: UserCreateInput
+  connect: UserWhereUniqueInput
+  disconnect: UserWhereUniqueInput
+  delete: UserWhereUniqueInput
+}
+
+input UserUpdateOneWithoutAnimalsInput {
+  create: UserCreateWithoutAnimalsInput
+  connect: UserWhereUniqueInput
+  disconnect: UserWhereUniqueInput
+  delete: UserWhereUniqueInput
+  update: UserUpdateWithoutAnimalsInput
+  upsert: UserUpsertWithoutAnimalsInput
 }
 
 input UserUpdateOneWithoutPostsInput {
@@ -479,15 +815,34 @@ input UserUpdateOneWithoutPostsInput {
   upsert: UserUpsertWithoutPostsInput
 }
 
+input UserUpdateWithoutAnimalsDataInput {
+  email: String
+  password: String
+  name: String
+  posts: PostUpdateManyWithoutAuthorInput
+}
+
+input UserUpdateWithoutAnimalsInput {
+  where: UserWhereUniqueInput!
+  data: UserUpdateWithoutAnimalsDataInput!
+}
+
 input UserUpdateWithoutPostsDataInput {
   email: String
   password: String
   name: String
+  animals: AnimalUpdateManyWithoutOwnersInput
 }
 
 input UserUpdateWithoutPostsInput {
   where: UserWhereUniqueInput!
   data: UserUpdateWithoutPostsDataInput!
+}
+
+input UserUpsertWithoutAnimalsInput {
+  where: UserWhereUniqueInput!
+  update: UserUpdateWithoutAnimalsDataInput!
+  create: UserCreateWithoutAnimalsInput!
 }
 
 input UserUpsertWithoutPostsInput {
@@ -558,6 +913,9 @@ input UserWhereInput {
   posts_every: PostWhereInput
   posts_some: PostWhereInput
   posts_none: PostWhereInput
+  animals_every: AnimalWhereInput
+  animals_some: AnimalWhereInput
+  animals_none: AnimalWhereInput
 }
 
 input UserWhereUniqueInput {
