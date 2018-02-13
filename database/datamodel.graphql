@@ -33,6 +33,7 @@ type Channel {
 }
 
 type ChannelMember {
+  id: ID! @unique
   name: User!
   channel: Channel!
   role: String!
