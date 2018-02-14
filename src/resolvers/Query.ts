@@ -30,6 +30,7 @@ export const Query = {
 
   me(parent, args, ctx: Context, info) {
     const id = getUserId(ctx);
+    console.log("============ id", id);
     return ctx.db.query.user({ where: { id } }, info);
   },
 

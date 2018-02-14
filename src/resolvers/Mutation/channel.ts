@@ -4,9 +4,10 @@ export const channel = {
   async createChannel(parent, args, ctx: Context, info) {
     console.log(args);
     const userId = getUserId(ctx);
+
     // console.log(data);
     console.log("creating channel");
-    return ctx.db.mutation.createChannel(
+    const channel = await ctx.db.mutation.createChannel(
       {
         data: {
           ...args,
@@ -17,5 +18,18 @@ export const channel = {
       },
       info
     );
+    console.log(channel);
+    await ctx.db.mutation.createChannelMember({
+      data: {
+        name: {
+          connect: { id: userId }
+        },
+        channel: {
+          connect: { id: channel.id }
+        },
+        role: "admin"
+      }
+    });
+    return channel;
   }
 };

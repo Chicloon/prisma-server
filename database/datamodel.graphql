@@ -15,6 +15,7 @@ type User {
   name: String! @unique
   posts: [Post!]!
   animals: [Animal!]!
+  channels: [ChannelMember!]!
 }
 
 type Animal {
@@ -27,14 +28,13 @@ type Animal {
 
 type Channel {
   id: ID! @unique
-  name: String!
-  owner: User!
+  name: String! @unique
   members: [ChannelMember!]!
 }
 
 type ChannelMember {
   id: ID! @unique
-  name: User!
+  member: User!
   channel: Channel!
   role: String!
 }

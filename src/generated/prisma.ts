@@ -20,8 +20,14 @@ type Animal implements Node {
 type Channel implements Node {
   id: ID!
   name: String!
-  owner(where: UserWhereInput): User!
   members(where: ChannelMemberWhereInput, orderBy: ChannelMemberOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ChannelMember!]
+}
+
+type ChannelMember implements Node {
+  id: ID!
+  member(where: UserWhereInput): User!
+  channel(where: ChannelWhereInput): Channel!
+  role: String!
 }
 
 type Post implements Node {
@@ -41,6 +47,7 @@ type User implements Node {
   name: String!
   posts(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Post!]
   animals(where: AnimalWhereInput, orderBy: AnimalOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Animal!]
+  channels(where: ChannelMemberWhereInput, orderBy: ChannelMemberOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [ChannelMember!]
 }
 
 
@@ -230,7 +237,6 @@ type ChannelConnection {
 
 input ChannelCreateInput {
   name: String!
-  owner: UserCreateOneInput!
   members: ChannelMemberCreateManyWithoutChannelInput
 }
 
@@ -241,18 +247,11 @@ input ChannelCreateOneWithoutMembersInput {
 
 input ChannelCreateWithoutMembersInput {
   name: String!
-  owner: UserCreateOneInput!
 }
 
 type ChannelEdge {
   node: Channel!
   cursor: String!
-}
-
-type ChannelMember {
-  name(where: UserWhereInput): User!
-  channel(where: ChannelWhereInput): Channel!
-  role: String!
 }
 
 type ChannelMemberConnection {
@@ -263,17 +262,28 @@ type ChannelMemberConnection {
 
 input ChannelMemberCreateInput {
   role: String!
-  name: UserCreateOneInput!
+  member: UserCreateOneWithoutChannelsInput!
   channel: ChannelCreateOneWithoutMembersInput!
 }
 
 input ChannelMemberCreateManyWithoutChannelInput {
   create: [ChannelMemberCreateWithoutChannelInput!]
+  connect: [ChannelMemberWhereUniqueInput!]
+}
+
+input ChannelMemberCreateManyWithoutMemberInput {
+  create: [ChannelMemberCreateWithoutMemberInput!]
+  connect: [ChannelMemberWhereUniqueInput!]
 }
 
 input ChannelMemberCreateWithoutChannelInput {
   role: String!
-  name: UserCreateOneInput!
+  member: UserCreateOneWithoutChannelsInput!
+}
+
+input ChannelMemberCreateWithoutMemberInput {
+  role: String!
+  channel: ChannelCreateOneWithoutMembersInput!
 }
 
 type ChannelMemberEdge {
@@ -282,10 +292,10 @@ type ChannelMemberEdge {
 }
 
 enum ChannelMemberOrderByInput {
-  role_ASC
-  role_DESC
   id_ASC
   id_DESC
+  role_ASC
+  role_DESC
   updatedAt_ASC
   updatedAt_DESC
   createdAt_ASC
@@ -293,6 +303,7 @@ enum ChannelMemberOrderByInput {
 }
 
 type ChannelMemberPreviousValues {
+  id: ID!
   role: String!
 }
 
@@ -315,17 +326,77 @@ input ChannelMemberSubscriptionWhereInput {
 
 input ChannelMemberUpdateInput {
   role: String
-  name: UserUpdateOneInput
+  member: UserUpdateOneWithoutChannelsInput
   channel: ChannelUpdateOneWithoutMembersInput
 }
 
 input ChannelMemberUpdateManyWithoutChannelInput {
   create: [ChannelMemberCreateWithoutChannelInput!]
+  connect: [ChannelMemberWhereUniqueInput!]
+  disconnect: [ChannelMemberWhereUniqueInput!]
+  delete: [ChannelMemberWhereUniqueInput!]
+  update: [ChannelMemberUpdateWithoutChannelInput!]
+  upsert: [ChannelMemberUpsertWithoutChannelInput!]
+}
+
+input ChannelMemberUpdateManyWithoutMemberInput {
+  create: [ChannelMemberCreateWithoutMemberInput!]
+  connect: [ChannelMemberWhereUniqueInput!]
+  disconnect: [ChannelMemberWhereUniqueInput!]
+  delete: [ChannelMemberWhereUniqueInput!]
+  update: [ChannelMemberUpdateWithoutMemberInput!]
+  upsert: [ChannelMemberUpsertWithoutMemberInput!]
+}
+
+input ChannelMemberUpdateWithoutChannelDataInput {
+  role: String
+  member: UserUpdateOneWithoutChannelsInput
+}
+
+input ChannelMemberUpdateWithoutChannelInput {
+  where: ChannelMemberWhereUniqueInput!
+  data: ChannelMemberUpdateWithoutChannelDataInput!
+}
+
+input ChannelMemberUpdateWithoutMemberDataInput {
+  role: String
+  channel: ChannelUpdateOneWithoutMembersInput
+}
+
+input ChannelMemberUpdateWithoutMemberInput {
+  where: ChannelMemberWhereUniqueInput!
+  data: ChannelMemberUpdateWithoutMemberDataInput!
+}
+
+input ChannelMemberUpsertWithoutChannelInput {
+  where: ChannelMemberWhereUniqueInput!
+  update: ChannelMemberUpdateWithoutChannelDataInput!
+  create: ChannelMemberCreateWithoutChannelInput!
+}
+
+input ChannelMemberUpsertWithoutMemberInput {
+  where: ChannelMemberWhereUniqueInput!
+  update: ChannelMemberUpdateWithoutMemberDataInput!
+  create: ChannelMemberCreateWithoutMemberInput!
 }
 
 input ChannelMemberWhereInput {
   AND: [ChannelMemberWhereInput!]
   OR: [ChannelMemberWhereInput!]
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
   role: String
   role_not: String
   role_in: [String!]
@@ -340,8 +411,12 @@ input ChannelMemberWhereInput {
   role_not_starts_with: String
   role_ends_with: String
   role_not_ends_with: String
-  name: UserWhereInput
+  member: UserWhereInput
   channel: ChannelWhereInput
+}
+
+input ChannelMemberWhereUniqueInput {
+  id: ID
 }
 
 enum ChannelOrderByInput {
@@ -379,7 +454,6 @@ input ChannelSubscriptionWhereInput {
 
 input ChannelUpdateInput {
   name: String
-  owner: UserUpdateOneInput
   members: ChannelMemberUpdateManyWithoutChannelInput
 }
 
@@ -394,7 +468,6 @@ input ChannelUpdateOneWithoutMembersInput {
 
 input ChannelUpdateWithoutMembersDataInput {
   name: String
-  owner: UserUpdateOneInput
 }
 
 input ChannelUpdateWithoutMembersInput {
@@ -439,7 +512,6 @@ input ChannelWhereInput {
   name_not_starts_with: String
   name_ends_with: String
   name_not_ends_with: String
-  owner: UserWhereInput
   members_every: ChannelMemberWhereInput
   members_some: ChannelMemberWhereInput
   members_none: ChannelMemberWhereInput
@@ -447,6 +519,7 @@ input ChannelWhereInput {
 
 input ChannelWhereUniqueInput {
   id: ID
+  name: String
 }
 
 scalar DateTime
@@ -463,14 +536,17 @@ type Mutation {
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateAnimal(data: AnimalUpdateInput!, where: AnimalWhereUniqueInput!): Animal
   updateChannel(data: ChannelUpdateInput!, where: ChannelWhereUniqueInput!): Channel
+  updateChannelMember(data: ChannelMemberUpdateInput!, where: ChannelMemberWhereUniqueInput!): ChannelMember
   deletePost(where: PostWhereUniqueInput!): Post
   deleteUser(where: UserWhereUniqueInput!): User
   deleteAnimal(where: AnimalWhereUniqueInput!): Animal
   deleteChannel(where: ChannelWhereUniqueInput!): Channel
+  deleteChannelMember(where: ChannelMemberWhereUniqueInput!): ChannelMember
   upsertPost(where: PostWhereUniqueInput!, create: PostCreateInput!, update: PostUpdateInput!): Post!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   upsertAnimal(where: AnimalWhereUniqueInput!, create: AnimalCreateInput!, update: AnimalUpdateInput!): Animal!
   upsertChannel(where: ChannelWhereUniqueInput!, create: ChannelCreateInput!, update: ChannelUpdateInput!): Channel!
+  upsertChannelMember(where: ChannelMemberWhereUniqueInput!, create: ChannelMemberCreateInput!, update: ChannelMemberUpdateInput!): ChannelMember!
   updateManyPosts(data: PostUpdateInput!, where: PostWhereInput!): BatchPayload!
   updateManyUsers(data: UserUpdateInput!, where: UserWhereInput!): BatchPayload!
   updateManyAnimals(data: AnimalUpdateInput!, where: AnimalWhereInput!): BatchPayload!
@@ -683,6 +759,7 @@ type Query {
   user(where: UserWhereUniqueInput!): User
   animal(where: AnimalWhereUniqueInput!): Animal
   channel(where: ChannelWhereUniqueInput!): Channel
+  channelMember(where: ChannelMemberWhereUniqueInput!): ChannelMember
   postsConnection(where: PostWhereInput, orderBy: PostOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): PostConnection!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   animalsConnection(where: AnimalWhereInput, orderBy: AnimalOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): AnimalConnection!
@@ -711,15 +788,16 @@ input UserCreateInput {
   name: String!
   posts: PostCreateManyWithoutAuthorInput
   animals: AnimalCreateManyWithoutOwnersInput
-}
-
-input UserCreateOneInput {
-  create: UserCreateInput
-  connect: UserWhereUniqueInput
+  channels: ChannelMemberCreateManyWithoutMemberInput
 }
 
 input UserCreateOneWithoutAnimalsInput {
   create: UserCreateWithoutAnimalsInput
+  connect: UserWhereUniqueInput
+}
+
+input UserCreateOneWithoutChannelsInput {
+  create: UserCreateWithoutChannelsInput
   connect: UserWhereUniqueInput
 }
 
@@ -733,6 +811,15 @@ input UserCreateWithoutAnimalsInput {
   password: String!
   name: String!
   posts: PostCreateManyWithoutAuthorInput
+  channels: ChannelMemberCreateManyWithoutMemberInput
+}
+
+input UserCreateWithoutChannelsInput {
+  email: String!
+  password: String!
+  name: String!
+  posts: PostCreateManyWithoutAuthorInput
+  animals: AnimalCreateManyWithoutOwnersInput
 }
 
 input UserCreateWithoutPostsInput {
@@ -740,6 +827,7 @@ input UserCreateWithoutPostsInput {
   password: String!
   name: String!
   animals: AnimalCreateManyWithoutOwnersInput
+  channels: ChannelMemberCreateManyWithoutMemberInput
 }
 
 type UserEdge {
@@ -792,13 +880,7 @@ input UserUpdateInput {
   name: String
   posts: PostUpdateManyWithoutAuthorInput
   animals: AnimalUpdateManyWithoutOwnersInput
-}
-
-input UserUpdateOneInput {
-  create: UserCreateInput
-  connect: UserWhereUniqueInput
-  disconnect: UserWhereUniqueInput
-  delete: UserWhereUniqueInput
+  channels: ChannelMemberUpdateManyWithoutMemberInput
 }
 
 input UserUpdateOneWithoutAnimalsInput {
@@ -808,6 +890,15 @@ input UserUpdateOneWithoutAnimalsInput {
   delete: UserWhereUniqueInput
   update: UserUpdateWithoutAnimalsInput
   upsert: UserUpsertWithoutAnimalsInput
+}
+
+input UserUpdateOneWithoutChannelsInput {
+  create: UserCreateWithoutChannelsInput
+  connect: UserWhereUniqueInput
+  disconnect: UserWhereUniqueInput
+  delete: UserWhereUniqueInput
+  update: UserUpdateWithoutChannelsInput
+  upsert: UserUpsertWithoutChannelsInput
 }
 
 input UserUpdateOneWithoutPostsInput {
@@ -824,6 +915,7 @@ input UserUpdateWithoutAnimalsDataInput {
   password: String
   name: String
   posts: PostUpdateManyWithoutAuthorInput
+  channels: ChannelMemberUpdateManyWithoutMemberInput
 }
 
 input UserUpdateWithoutAnimalsInput {
@@ -831,11 +923,25 @@ input UserUpdateWithoutAnimalsInput {
   data: UserUpdateWithoutAnimalsDataInput!
 }
 
+input UserUpdateWithoutChannelsDataInput {
+  email: String
+  password: String
+  name: String
+  posts: PostUpdateManyWithoutAuthorInput
+  animals: AnimalUpdateManyWithoutOwnersInput
+}
+
+input UserUpdateWithoutChannelsInput {
+  where: UserWhereUniqueInput!
+  data: UserUpdateWithoutChannelsDataInput!
+}
+
 input UserUpdateWithoutPostsDataInput {
   email: String
   password: String
   name: String
   animals: AnimalUpdateManyWithoutOwnersInput
+  channels: ChannelMemberUpdateManyWithoutMemberInput
 }
 
 input UserUpdateWithoutPostsInput {
@@ -847,6 +953,12 @@ input UserUpsertWithoutAnimalsInput {
   where: UserWhereUniqueInput!
   update: UserUpdateWithoutAnimalsDataInput!
   create: UserCreateWithoutAnimalsInput!
+}
+
+input UserUpsertWithoutChannelsInput {
+  where: UserWhereUniqueInput!
+  update: UserUpdateWithoutChannelsDataInput!
+  create: UserCreateWithoutChannelsInput!
 }
 
 input UserUpsertWithoutPostsInput {
@@ -920,6 +1032,9 @@ input UserWhereInput {
   animals_every: AnimalWhereInput
   animals_some: AnimalWhereInput
   animals_none: AnimalWhereInput
+  channels_every: ChannelMemberWhereInput
+  channels_some: ChannelMemberWhereInput
+  channels_none: ChannelMemberWhereInput
 }
 
 input UserWhereUniqueInput {
@@ -957,6 +1072,16 @@ export type AnimalOrderByInput =
   'createdAt_ASC' |
   'createdAt_DESC'
 
+export type ChannelMemberOrderByInput = 
+  'id_ASC' |
+  'id_DESC' |
+  'role_ASC' |
+  'role_DESC' |
+  'updatedAt_ASC' |
+  'updatedAt_DESC' |
+  'createdAt_ASC' |
+  'createdAt_DESC'
+
 export type UserOrderByInput = 
   'id_ASC' |
   'id_DESC' |
@@ -981,25 +1106,14 @@ export type ChannelOrderByInput =
   'createdAt_ASC' |
   'createdAt_DESC'
 
-export type ChannelMemberOrderByInput = 
-  'role_ASC' |
-  'role_DESC' |
-  'id_ASC' |
-  'id_DESC' |
-  'updatedAt_ASC' |
-  'updatedAt_DESC' |
-  'createdAt_ASC' |
-  'createdAt_DESC'
-
 export type MutationType = 
   'CREATED' |
   'UPDATED' |
   'DELETED'
 
-export interface ChannelCreateInput {
-  name: String
-  owner: UserCreateOneInput
-  members?: ChannelMemberCreateManyWithoutChannelInput
+export interface ChannelMemberCreateWithoutChannelInput {
+  role: String
+  member: UserCreateOneWithoutChannelsInput
 }
 
 export interface PostWhereInput {
@@ -1068,36 +1182,80 @@ export interface PostWhereInput {
   author?: UserWhereInput
 }
 
-export interface PostUpdateWithoutAuthorDataInput {
+export interface PostUpdateInput {
   isPublished?: Boolean
   title?: String
   text?: String
+  author?: UserUpdateOneWithoutPostsInput
 }
 
-export interface AnimalUpsertWithoutOwnersInput {
-  where: AnimalWhereUniqueInput
-  update: AnimalUpdateWithoutOwnersDataInput
-  create: AnimalCreateWithoutOwnersInput
+export interface ChannelMemberWhereInput {
+  AND?: ChannelMemberWhereInput[] | ChannelMemberWhereInput
+  OR?: ChannelMemberWhereInput[] | ChannelMemberWhereInput
+  id?: ID_Input
+  id_not?: ID_Input
+  id_in?: ID_Input[] | ID_Input
+  id_not_in?: ID_Input[] | ID_Input
+  id_lt?: ID_Input
+  id_lte?: ID_Input
+  id_gt?: ID_Input
+  id_gte?: ID_Input
+  id_contains?: ID_Input
+  id_not_contains?: ID_Input
+  id_starts_with?: ID_Input
+  id_not_starts_with?: ID_Input
+  id_ends_with?: ID_Input
+  id_not_ends_with?: ID_Input
+  role?: String
+  role_not?: String
+  role_in?: String[] | String
+  role_not_in?: String[] | String
+  role_lt?: String
+  role_lte?: String
+  role_gt?: String
+  role_gte?: String
+  role_contains?: String
+  role_not_contains?: String
+  role_starts_with?: String
+  role_not_starts_with?: String
+  role_ends_with?: String
+  role_not_ends_with?: String
+  member?: UserWhereInput
+  channel?: ChannelWhereInput
 }
 
-export interface PostUpdateWithoutAuthorInput {
-  where: PostWhereUniqueInput
-  data: PostUpdateWithoutAuthorDataInput
+export interface AnimalCreateWithoutOwnersInput {
+  name: String
+  tail: Boolean
+  legs: Int
 }
 
-export interface ChannelMemberCreateInput {
+export interface UserUpdateInput {
+  email?: String
+  password?: String
+  name?: String
+  posts?: PostUpdateManyWithoutAuthorInput
+  animals?: AnimalUpdateManyWithoutOwnersInput
+  channels?: ChannelMemberUpdateManyWithoutMemberInput
+}
+
+export interface ChannelMemberCreateManyWithoutMemberInput {
+  create?: ChannelMemberCreateWithoutMemberInput[] | ChannelMemberCreateWithoutMemberInput
+  connect?: ChannelMemberWhereUniqueInput[] | ChannelMemberWhereUniqueInput
+}
+
+export interface UserUpdateOneWithoutPostsInput {
+  create?: UserCreateWithoutPostsInput
+  connect?: UserWhereUniqueInput
+  disconnect?: UserWhereUniqueInput
+  delete?: UserWhereUniqueInput
+  update?: UserUpdateWithoutPostsInput
+  upsert?: UserUpsertWithoutPostsInput
+}
+
+export interface ChannelMemberCreateWithoutMemberInput {
   role: String
-  name: UserCreateOneInput
   channel: ChannelCreateOneWithoutMembersInput
-}
-
-export interface PostUpdateManyWithoutAuthorInput {
-  create?: PostCreateWithoutAuthorInput[] | PostCreateWithoutAuthorInput
-  connect?: PostWhereUniqueInput[] | PostWhereUniqueInput
-  disconnect?: PostWhereUniqueInput[] | PostWhereUniqueInput
-  delete?: PostWhereUniqueInput[] | PostWhereUniqueInput
-  update?: PostUpdateWithoutAuthorInput[] | PostUpdateWithoutAuthorInput
-  upsert?: PostUpsertWithoutAuthorInput[] | PostUpsertWithoutAuthorInput
 }
 
 export interface ChannelMemberSubscriptionWhereInput {
@@ -1110,11 +1268,9 @@ export interface ChannelMemberSubscriptionWhereInput {
   node?: ChannelMemberWhereInput
 }
 
-export interface PostCreateInput {
-  isPublished?: Boolean
-  title: String
-  text: String
-  author: UserCreateOneWithoutPostsInput
+export interface ChannelCreateOneWithoutMembersInput {
+  create?: ChannelCreateWithoutMembersInput
+  connect?: ChannelWhereUniqueInput
 }
 
 export interface ChannelSubscriptionWhereInput {
@@ -1127,9 +1283,164 @@ export interface ChannelSubscriptionWhereInput {
   node?: ChannelWhereInput
 }
 
-export interface UserCreateOneWithoutPostsInput {
-  create?: UserCreateWithoutPostsInput
+export interface ChannelCreateWithoutMembersInput {
+  name: String
+}
+
+export interface AnimalSubscriptionWhereInput {
+  AND?: AnimalSubscriptionWhereInput[] | AnimalSubscriptionWhereInput
+  OR?: AnimalSubscriptionWhereInput[] | AnimalSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: AnimalWhereInput
+}
+
+export interface UserCreateInput {
+  email: String
+  password: String
+  name: String
+  posts?: PostCreateManyWithoutAuthorInput
+  animals?: AnimalCreateManyWithoutOwnersInput
+  channels?: ChannelMemberCreateManyWithoutMemberInput
+}
+
+export interface PostSubscriptionWhereInput {
+  AND?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput
+  OR?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: PostWhereInput
+}
+
+export interface PostCreateManyWithoutAuthorInput {
+  create?: PostCreateWithoutAuthorInput[] | PostCreateWithoutAuthorInput
+  connect?: PostWhereUniqueInput[] | PostWhereUniqueInput
+}
+
+export interface PostWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface PostCreateWithoutAuthorInput {
+  isPublished?: Boolean
+  title: String
+  text: String
+}
+
+export interface AnimalWhereUniqueInput {
+  id?: ID_Input
+  name?: String
+}
+
+export interface AnimalCreateInput {
+  name: String
+  tail: Boolean
+  legs: Int
+  owners: UserCreateOneWithoutAnimalsInput
+}
+
+export interface ChannelMemberWhereUniqueInput {
+  id?: ID_Input
+}
+
+export interface UserCreateOneWithoutAnimalsInput {
+  create?: UserCreateWithoutAnimalsInput
   connect?: UserWhereUniqueInput
+}
+
+export interface UserUpsertWithoutChannelsInput {
+  where: UserWhereUniqueInput
+  update: UserUpdateWithoutChannelsDataInput
+  create: UserCreateWithoutChannelsInput
+}
+
+export interface UserCreateWithoutAnimalsInput {
+  email: String
+  password: String
+  name: String
+  posts?: PostCreateManyWithoutAuthorInput
+  channels?: ChannelMemberCreateManyWithoutMemberInput
+}
+
+export interface UserUpdateWithoutChannelsInput {
+  where: UserWhereUniqueInput
+  data: UserUpdateWithoutChannelsDataInput
+}
+
+export interface ChannelCreateInput {
+  name: String
+  members?: ChannelMemberCreateManyWithoutChannelInput
+}
+
+export interface ChannelMemberUpdateWithoutChannelDataInput {
+  role?: String
+  member?: UserUpdateOneWithoutChannelsInput
+}
+
+export interface ChannelMemberCreateManyWithoutChannelInput {
+  create?: ChannelMemberCreateWithoutChannelInput[] | ChannelMemberCreateWithoutChannelInput
+  connect?: ChannelMemberWhereUniqueInput[] | ChannelMemberWhereUniqueInput
+}
+
+export interface ChannelMemberUpdateManyWithoutChannelInput {
+  create?: ChannelMemberCreateWithoutChannelInput[] | ChannelMemberCreateWithoutChannelInput
+  connect?: ChannelMemberWhereUniqueInput[] | ChannelMemberWhereUniqueInput
+  disconnect?: ChannelMemberWhereUniqueInput[] | ChannelMemberWhereUniqueInput
+  delete?: ChannelMemberWhereUniqueInput[] | ChannelMemberWhereUniqueInput
+  update?: ChannelMemberUpdateWithoutChannelInput[] | ChannelMemberUpdateWithoutChannelInput
+  upsert?: ChannelMemberUpsertWithoutChannelInput[] | ChannelMemberUpsertWithoutChannelInput
+}
+
+export interface PostUpdateWithoutAuthorInput {
+  where: PostWhereUniqueInput
+  data: PostUpdateWithoutAuthorDataInput
+}
+
+export interface UserUpsertWithoutAnimalsInput {
+  where: UserWhereUniqueInput
+  update: UserUpdateWithoutAnimalsDataInput
+  create: UserCreateWithoutAnimalsInput
+}
+
+export interface UserCreateOneWithoutChannelsInput {
+  create?: UserCreateWithoutChannelsInput
+  connect?: UserWhereUniqueInput
+}
+
+export interface UserUpdateWithoutAnimalsInput {
+  where: UserWhereUniqueInput
+  data: UserUpdateWithoutAnimalsDataInput
+}
+
+export interface UserCreateWithoutChannelsInput {
+  email: String
+  password: String
+  name: String
+  posts?: PostCreateManyWithoutAuthorInput
+  animals?: AnimalCreateManyWithoutOwnersInput
+}
+
+export interface AnimalUpdateInput {
+  name?: String
+  tail?: Boolean
+  legs?: Int
+  owners?: UserUpdateOneWithoutAnimalsInput
+}
+
+export interface ChannelMemberCreateInput {
+  role: String
+  member: UserCreateOneWithoutChannelsInput
+  channel: ChannelCreateOneWithoutMembersInput
+}
+
+export interface PostUpdateWithoutAuthorDataInput {
+  isPublished?: Boolean
+  title?: String
+  text?: String
 }
 
 export interface ChannelWhereInput {
@@ -1163,27 +1474,23 @@ export interface ChannelWhereInput {
   name_not_starts_with?: String
   name_ends_with?: String
   name_not_ends_with?: String
-  owner?: UserWhereInput
   members_every?: ChannelMemberWhereInput
   members_some?: ChannelMemberWhereInput
   members_none?: ChannelMemberWhereInput
 }
 
-export interface UserCreateWithoutPostsInput {
-  email: String
-  password: String
-  name: String
-  animals?: AnimalCreateManyWithoutOwnersInput
+export interface UserCreateOneWithoutPostsInput {
+  create?: UserCreateWithoutPostsInput
+  connect?: UserWhereUniqueInput
 }
 
-export interface AnimalSubscriptionWhereInput {
-  AND?: AnimalSubscriptionWhereInput[] | AnimalSubscriptionWhereInput
-  OR?: AnimalSubscriptionWhereInput[] | AnimalSubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: AnimalWhereInput
+export interface PostUpdateManyWithoutAuthorInput {
+  create?: PostCreateWithoutAuthorInput[] | PostCreateWithoutAuthorInput
+  connect?: PostWhereUniqueInput[] | PostWhereUniqueInput
+  disconnect?: PostWhereUniqueInput[] | PostWhereUniqueInput
+  delete?: PostWhereUniqueInput[] | PostWhereUniqueInput
+  update?: PostUpdateWithoutAuthorInput[] | PostUpdateWithoutAuthorInput
+  upsert?: PostUpsertWithoutAuthorInput[] | PostUpsertWithoutAuthorInput
 }
 
 export interface AnimalCreateManyWithoutOwnersInput {
@@ -1191,130 +1498,9 @@ export interface AnimalCreateManyWithoutOwnersInput {
   connect?: AnimalWhereUniqueInput[] | AnimalWhereUniqueInput
 }
 
-export interface PostSubscriptionWhereInput {
-  AND?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput
-  OR?: PostSubscriptionWhereInput[] | PostSubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: PostWhereInput
-}
-
-export interface AnimalCreateWithoutOwnersInput {
-  name: String
-  tail: Boolean
-  legs: Int
-}
-
-export interface PostWhereUniqueInput {
-  id?: ID_Input
-}
-
-export interface UserCreateInput {
-  email: String
-  password: String
-  name: String
-  posts?: PostCreateManyWithoutAuthorInput
-  animals?: AnimalCreateManyWithoutOwnersInput
-}
-
-export interface AnimalWhereUniqueInput {
-  id?: ID_Input
-  name?: String
-}
-
-export interface PostCreateManyWithoutAuthorInput {
-  create?: PostCreateWithoutAuthorInput[] | PostCreateWithoutAuthorInput
-  connect?: PostWhereUniqueInput[] | PostWhereUniqueInput
-}
-
-export interface ChannelUpdateWithoutMembersDataInput {
-  name?: String
-  owner?: UserUpdateOneInput
-}
-
-export interface PostCreateWithoutAuthorInput {
-  isPublished?: Boolean
-  title: String
-  text: String
-}
-
-export interface ChannelUpdateOneWithoutMembersInput {
-  create?: ChannelCreateWithoutMembersInput
-  connect?: ChannelWhereUniqueInput
-  disconnect?: ChannelWhereUniqueInput
-  delete?: ChannelWhereUniqueInput
-  update?: ChannelUpdateWithoutMembersInput
-  upsert?: ChannelUpsertWithoutMembersInput
-}
-
-export interface AnimalCreateInput {
-  name: String
-  tail: Boolean
-  legs: Int
-  owners: UserCreateOneWithoutAnimalsInput
-}
-
-export interface ChannelMemberUpdateManyWithoutChannelInput {
-  create?: ChannelMemberCreateWithoutChannelInput[] | ChannelMemberCreateWithoutChannelInput
-}
-
-export interface UserCreateOneWithoutAnimalsInput {
-  create?: UserCreateWithoutAnimalsInput
-  connect?: UserWhereUniqueInput
-}
-
-export interface ChannelUpdateInput {
-  name?: String
-  owner?: UserUpdateOneInput
-  members?: ChannelMemberUpdateManyWithoutChannelInput
-}
-
-export interface UserCreateWithoutAnimalsInput {
-  email: String
-  password: String
-  name: String
-  posts?: PostCreateManyWithoutAuthorInput
-}
-
-export interface UserUpdateWithoutAnimalsDataInput {
-  email?: String
-  password?: String
-  name?: String
-  posts?: PostUpdateManyWithoutAuthorInput
-}
-
-export interface UserUpdateInput {
-  email?: String
-  password?: String
-  name?: String
-  posts?: PostUpdateManyWithoutAuthorInput
-  animals?: AnimalUpdateManyWithoutOwnersInput
-}
-
-export interface UserUpdateOneWithoutAnimalsInput {
-  create?: UserCreateWithoutAnimalsInput
-  connect?: UserWhereUniqueInput
-  disconnect?: UserWhereUniqueInput
-  delete?: UserWhereUniqueInput
-  update?: UserUpdateWithoutAnimalsInput
-  upsert?: UserUpsertWithoutAnimalsInput
-}
-
-export interface UserCreateOneInput {
-  create?: UserCreateInput
-  connect?: UserWhereUniqueInput
-}
-
-export interface PostUpsertWithoutAuthorInput {
-  where: PostWhereUniqueInput
-  update: PostUpdateWithoutAuthorDataInput
-  create: PostCreateWithoutAuthorInput
-}
-
-export interface ChannelMemberCreateManyWithoutChannelInput {
-  create?: ChannelMemberCreateWithoutChannelInput[] | ChannelMemberCreateWithoutChannelInput
+export interface UserUpdateWithoutPostsInput {
+  where: UserWhereUniqueInput
+  data: UserUpdateWithoutPostsDataInput
 }
 
 export interface AnimalWhereInput {
@@ -1361,30 +1547,145 @@ export interface AnimalWhereInput {
   owners?: UserWhereInput
 }
 
-export interface ChannelMemberCreateWithoutChannelInput {
-  role: String
-  name: UserCreateOneInput
+export interface UserUpdateWithoutPostsDataInput {
+  email?: String
+  password?: String
+  name?: String
+  animals?: AnimalUpdateManyWithoutOwnersInput
+  channels?: ChannelMemberUpdateManyWithoutMemberInput
 }
 
-export interface ChannelMemberWhereInput {
-  AND?: ChannelMemberWhereInput[] | ChannelMemberWhereInput
-  OR?: ChannelMemberWhereInput[] | ChannelMemberWhereInput
+export interface UserSubscriptionWhereInput {
+  AND?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput
+  OR?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput
+  mutation_in?: MutationType[] | MutationType
+  updatedFields_contains?: String
+  updatedFields_contains_every?: String[] | String
+  updatedFields_contains_some?: String[] | String
+  node?: UserWhereInput
+}
+
+export interface AnimalUpdateManyWithoutOwnersInput {
+  create?: AnimalCreateWithoutOwnersInput[] | AnimalCreateWithoutOwnersInput
+  connect?: AnimalWhereUniqueInput[] | AnimalWhereUniqueInput
+  disconnect?: AnimalWhereUniqueInput[] | AnimalWhereUniqueInput
+  delete?: AnimalWhereUniqueInput[] | AnimalWhereUniqueInput
+  update?: AnimalUpdateWithoutOwnersInput[] | AnimalUpdateWithoutOwnersInput
+  upsert?: AnimalUpsertWithoutOwnersInput[] | AnimalUpsertWithoutOwnersInput
+}
+
+export interface UserWhereUniqueInput {
+  id?: ID_Input
+  email?: String
+  name?: String
+}
+
+export interface AnimalUpdateWithoutOwnersInput {
+  where: AnimalWhereUniqueInput
+  data: AnimalUpdateWithoutOwnersDataInput
+}
+
+export interface ChannelMemberUpsertWithoutChannelInput {
+  where: ChannelMemberWhereUniqueInput
+  update: ChannelMemberUpdateWithoutChannelDataInput
+  create: ChannelMemberCreateWithoutChannelInput
+}
+
+export interface AnimalUpdateWithoutOwnersDataInput {
+  name?: String
+  tail?: Boolean
+  legs?: Int
+}
+
+export interface UserUpdateOneWithoutChannelsInput {
+  create?: UserCreateWithoutChannelsInput
+  connect?: UserWhereUniqueInput
+  disconnect?: UserWhereUniqueInput
+  delete?: UserWhereUniqueInput
+  update?: UserUpdateWithoutChannelsInput
+  upsert?: UserUpsertWithoutChannelsInput
+}
+
+export interface AnimalUpsertWithoutOwnersInput {
+  where: AnimalWhereUniqueInput
+  update: AnimalUpdateWithoutOwnersDataInput
+  create: AnimalCreateWithoutOwnersInput
+}
+
+export interface ChannelUpdateInput {
+  name?: String
+  members?: ChannelMemberUpdateManyWithoutChannelInput
+}
+
+export interface ChannelMemberUpdateManyWithoutMemberInput {
+  create?: ChannelMemberCreateWithoutMemberInput[] | ChannelMemberCreateWithoutMemberInput
+  connect?: ChannelMemberWhereUniqueInput[] | ChannelMemberWhereUniqueInput
+  disconnect?: ChannelMemberWhereUniqueInput[] | ChannelMemberWhereUniqueInput
+  delete?: ChannelMemberWhereUniqueInput[] | ChannelMemberWhereUniqueInput
+  update?: ChannelMemberUpdateWithoutMemberInput[] | ChannelMemberUpdateWithoutMemberInput
+  upsert?: ChannelMemberUpsertWithoutMemberInput[] | ChannelMemberUpsertWithoutMemberInput
+}
+
+export interface UserUpdateOneWithoutAnimalsInput {
+  create?: UserCreateWithoutAnimalsInput
+  connect?: UserWhereUniqueInput
+  disconnect?: UserWhereUniqueInput
+  delete?: UserWhereUniqueInput
+  update?: UserUpdateWithoutAnimalsInput
+  upsert?: UserUpsertWithoutAnimalsInput
+}
+
+export interface ChannelMemberUpdateWithoutMemberInput {
+  where: ChannelMemberWhereUniqueInput
+  data: ChannelMemberUpdateWithoutMemberDataInput
+}
+
+export interface PostCreateInput {
+  isPublished?: Boolean
+  title: String
+  text: String
+  author: UserCreateOneWithoutPostsInput
+}
+
+export interface ChannelMemberUpdateWithoutMemberDataInput {
   role?: String
-  role_not?: String
-  role_in?: String[] | String
-  role_not_in?: String[] | String
-  role_lt?: String
-  role_lte?: String
-  role_gt?: String
-  role_gte?: String
-  role_contains?: String
-  role_not_contains?: String
-  role_starts_with?: String
-  role_not_starts_with?: String
-  role_ends_with?: String
-  role_not_ends_with?: String
-  name?: UserWhereInput
-  channel?: ChannelWhereInput
+  channel?: ChannelUpdateOneWithoutMembersInput
+}
+
+export interface ChannelMemberUpdateInput {
+  role?: String
+  member?: UserUpdateOneWithoutChannelsInput
+  channel?: ChannelUpdateOneWithoutMembersInput
+}
+
+export interface ChannelUpdateOneWithoutMembersInput {
+  create?: ChannelCreateWithoutMembersInput
+  connect?: ChannelWhereUniqueInput
+  disconnect?: ChannelWhereUniqueInput
+  delete?: ChannelWhereUniqueInput
+  update?: ChannelUpdateWithoutMembersInput
+  upsert?: ChannelUpsertWithoutMembersInput
+}
+
+export interface UserUpdateWithoutChannelsDataInput {
+  email?: String
+  password?: String
+  name?: String
+  posts?: PostUpdateManyWithoutAuthorInput
+  animals?: AnimalUpdateManyWithoutOwnersInput
+}
+
+export interface ChannelUpdateWithoutMembersInput {
+  where: ChannelWhereUniqueInput
+  data: ChannelUpdateWithoutMembersDataInput
+}
+
+export interface UserUpdateWithoutAnimalsDataInput {
+  email?: String
+  password?: String
+  name?: String
+  posts?: PostUpdateManyWithoutAuthorInput
+  channels?: ChannelMemberUpdateManyWithoutMemberInput
 }
 
 export interface UserUpsertWithoutPostsInput {
@@ -1393,64 +1694,36 @@ export interface UserUpsertWithoutPostsInput {
   create: UserCreateWithoutPostsInput
 }
 
+export interface ChannelMemberUpsertWithoutMemberInput {
+  where: ChannelMemberWhereUniqueInput
+  update: ChannelMemberUpdateWithoutMemberDataInput
+  create: ChannelMemberCreateWithoutMemberInput
+}
+
 export interface ChannelUpsertWithoutMembersInput {
   where: ChannelWhereUniqueInput
   update: ChannelUpdateWithoutMembersDataInput
   create: ChannelCreateWithoutMembersInput
 }
 
-export interface ChannelCreateOneWithoutMembersInput {
-  create?: ChannelCreateWithoutMembersInput
-  connect?: ChannelWhereUniqueInput
+export interface ChannelUpdateWithoutMembersDataInput {
+  name?: String
+}
+
+export interface PostUpsertWithoutAuthorInput {
+  where: PostWhereUniqueInput
+  update: PostUpdateWithoutAuthorDataInput
+  create: PostCreateWithoutAuthorInput
+}
+
+export interface ChannelMemberUpdateWithoutChannelInput {
+  where: ChannelMemberWhereUniqueInput
+  data: ChannelMemberUpdateWithoutChannelDataInput
 }
 
 export interface ChannelWhereUniqueInput {
   id?: ID_Input
-}
-
-export interface ChannelCreateWithoutMembersInput {
-  name: String
-  owner: UserCreateOneInput
-}
-
-export interface ChannelMemberUpdateInput {
-  role?: String
-  name?: UserUpdateOneInput
-  channel?: ChannelUpdateOneWithoutMembersInput
-}
-
-export interface PostUpdateInput {
-  isPublished?: Boolean
-  title?: String
-  text?: String
-  author?: UserUpdateOneWithoutPostsInput
-}
-
-export interface UserUpsertWithoutAnimalsInput {
-  where: UserWhereUniqueInput
-  update: UserUpdateWithoutAnimalsDataInput
-  create: UserCreateWithoutAnimalsInput
-}
-
-export interface UserUpdateOneWithoutPostsInput {
-  create?: UserCreateWithoutPostsInput
-  connect?: UserWhereUniqueInput
-  disconnect?: UserWhereUniqueInput
-  delete?: UserWhereUniqueInput
-  update?: UserUpdateWithoutPostsInput
-  upsert?: UserUpsertWithoutPostsInput
-}
-
-export interface AnimalUpdateInput {
   name?: String
-  tail?: Boolean
-  legs?: Int
-  owners?: UserUpdateOneWithoutAnimalsInput
-}
-
-export interface UserUpdateWithoutPostsInput {
-  where: UserWhereUniqueInput
-  data: UserUpdateWithoutPostsDataInput
 }
 
 export interface UserWhereInput {
@@ -1518,66 +1791,17 @@ export interface UserWhereInput {
   animals_every?: AnimalWhereInput
   animals_some?: AnimalWhereInput
   animals_none?: AnimalWhereInput
+  channels_every?: ChannelMemberWhereInput
+  channels_some?: ChannelMemberWhereInput
+  channels_none?: ChannelMemberWhereInput
 }
 
-export interface UserWhereUniqueInput {
-  id?: ID_Input
-  email?: String
-  name?: String
-}
-
-export interface AnimalUpdateWithoutOwnersDataInput {
-  name?: String
-  tail?: Boolean
-  legs?: Int
-}
-
-export interface AnimalUpdateWithoutOwnersInput {
-  where: AnimalWhereUniqueInput
-  data: AnimalUpdateWithoutOwnersDataInput
-}
-
-export interface AnimalUpdateManyWithoutOwnersInput {
-  create?: AnimalCreateWithoutOwnersInput[] | AnimalCreateWithoutOwnersInput
-  connect?: AnimalWhereUniqueInput[] | AnimalWhereUniqueInput
-  disconnect?: AnimalWhereUniqueInput[] | AnimalWhereUniqueInput
-  delete?: AnimalWhereUniqueInput[] | AnimalWhereUniqueInput
-  update?: AnimalUpdateWithoutOwnersInput[] | AnimalUpdateWithoutOwnersInput
-  upsert?: AnimalUpsertWithoutOwnersInput[] | AnimalUpsertWithoutOwnersInput
-}
-
-export interface UserUpdateWithoutPostsDataInput {
-  email?: String
-  password?: String
-  name?: String
-  animals?: AnimalUpdateManyWithoutOwnersInput
-}
-
-export interface ChannelUpdateWithoutMembersInput {
-  where: ChannelWhereUniqueInput
-  data: ChannelUpdateWithoutMembersDataInput
-}
-
-export interface UserSubscriptionWhereInput {
-  AND?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput
-  OR?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput
-  mutation_in?: MutationType[] | MutationType
-  updatedFields_contains?: String
-  updatedFields_contains_every?: String[] | String
-  updatedFields_contains_some?: String[] | String
-  node?: UserWhereInput
-}
-
-export interface UserUpdateWithoutAnimalsInput {
-  where: UserWhereUniqueInput
-  data: UserUpdateWithoutAnimalsDataInput
-}
-
-export interface UserUpdateOneInput {
-  create?: UserCreateInput
-  connect?: UserWhereUniqueInput
-  disconnect?: UserWhereUniqueInput
-  delete?: UserWhereUniqueInput
+export interface UserCreateWithoutPostsInput {
+  email: String
+  password: String
+  name: String
+  animals?: AnimalCreateManyWithoutOwnersInput
+  channels?: ChannelMemberCreateManyWithoutMemberInput
 }
 
 export interface Node {
@@ -1585,6 +1809,7 @@ export interface Node {
 }
 
 export interface ChannelMemberPreviousValues {
+  id: ID_Output
   role: String
 }
 
@@ -1593,6 +1818,20 @@ export interface PageInfo {
   hasPreviousPage: Boolean
   startCursor?: String
   endCursor?: String
+}
+
+export interface Animal extends Node {
+  id: ID_Output
+  name: String
+  tail: Boolean
+  legs: Int
+  owners: User
+}
+
+export interface PostConnection {
+  pageInfo: PageInfo
+  edges: PostEdge[]
+  aggregate: AggregatePost
 }
 
 export interface Post extends Node {
@@ -1605,26 +1844,11 @@ export interface Post extends Node {
   author: User
 }
 
-export interface PostConnection {
-  pageInfo: PageInfo
-  edges: PostEdge[]
-  aggregate: AggregatePost
-}
-
-export interface AggregateChannelMember {
-  count: Int
-}
-
-export interface ChannelMember {
-  name: User
-  channel: Channel
-  role: String
-}
-
-export interface ChannelMemberConnection {
-  pageInfo: PageInfo
-  edges: ChannelMemberEdge[]
-  aggregate: AggregateChannelMember
+export interface ChannelMemberSubscriptionPayload {
+  mutation: MutationType
+  node?: ChannelMember
+  updatedFields?: String[]
+  previousValues?: ChannelMemberPreviousValues
 }
 
 export interface ChannelMemberEdge {
@@ -1632,21 +1856,22 @@ export interface ChannelMemberEdge {
   cursor: String
 }
 
-export interface Animal extends Node {
-  id: ID_Output
-  name: String
-  tail: Boolean
-  legs: Int
-  owners: User
+export interface BatchPayload {
+  count: Long
 }
 
 export interface AggregateChannel {
   count: Int
 }
 
-export interface ChannelEdge {
-  node: Channel
-  cursor: String
+export interface User extends Node {
+  id: ID_Output
+  email: String
+  password: String
+  name: String
+  posts?: Post[]
+  animals?: Animal[]
+  channels?: ChannelMember[]
 }
 
 export interface ChannelConnection {
@@ -1655,14 +1880,21 @@ export interface ChannelConnection {
   aggregate: AggregateChannel
 }
 
+export interface ChannelPreviousValues {
+  id: ID_Output
+  name: String
+}
+
 export interface AnimalEdge {
   node: Animal
   cursor: String
 }
 
-export interface ChannelPreviousValues {
-  id: ID_Output
-  name: String
+export interface ChannelSubscriptionPayload {
+  mutation: MutationType
+  node?: Channel
+  updatedFields?: String[]
+  previousValues?: ChannelPreviousValues
 }
 
 export interface AggregateUser {
@@ -1691,23 +1923,21 @@ export interface PostPreviousValues {
   text: String
 }
 
-export interface ChannelMemberSubscriptionPayload {
-  mutation: MutationType
-  node?: ChannelMember
-  updatedFields?: String[]
-  previousValues?: ChannelMemberPreviousValues
+export interface PostEdge {
+  node: Post
+  cursor: String
 }
 
 export interface Channel extends Node {
   id: ID_Output
   name: String
-  owner: User
   members?: ChannelMember[]
 }
 
-export interface PostEdge {
-  node: Post
-  cursor: String
+export interface ChannelMemberConnection {
+  pageInfo: PageInfo
+  edges: ChannelMemberEdge[]
+  aggregate: AggregateChannelMember
 }
 
 export interface UserSubscriptionPayload {
@@ -1740,11 +1970,11 @@ export interface AnimalSubscriptionPayload {
   previousValues?: AnimalPreviousValues
 }
 
-export interface ChannelSubscriptionPayload {
-  mutation: MutationType
-  node?: Channel
-  updatedFields?: String[]
-  previousValues?: ChannelPreviousValues
+export interface ChannelMember extends Node {
+  id: ID_Output
+  member: User
+  channel: Channel
+  role: String
 }
 
 export interface UserPreviousValues {
@@ -1754,8 +1984,8 @@ export interface UserPreviousValues {
   name: String
 }
 
-export interface BatchPayload {
-  count: Long
+export interface AggregatePost {
+  count: Int
 }
 
 export interface AnimalConnection {
@@ -1764,16 +1994,12 @@ export interface AnimalConnection {
   aggregate: AggregateAnimal
 }
 
-export interface User extends Node {
-  id: ID_Output
-  email: String
-  password: String
-  name: String
-  posts?: Post[]
-  animals?: Animal[]
+export interface ChannelEdge {
+  node: Channel
+  cursor: String
 }
 
-export interface AggregatePost {
+export interface AggregateChannelMember {
   count: Int
 }
 
@@ -1787,20 +2013,20 @@ The `Int` scalar type represents non-fractional signed whole numeric values. Int
 */
 export type Int = number
 
-export type Long = string
-
 /*
 The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
 */
 export type ID_Input = string | number
 export type ID_Output = string
 
-export type DateTime = string
+export type Long = string
 
 /*
 The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
 */
 export type String = string
+
+export type DateTime = string
 
 export interface Schema {
   query: Query
@@ -1818,6 +2044,7 @@ export type Query = {
   user: (args: { where: UserWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<User | null>
   animal: (args: { where: AnimalWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Animal | null>
   channel: (args: { where: ChannelWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Channel | null>
+  channelMember: (args: { where: ChannelMemberWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<ChannelMember | null>
   postsConnection: (args: { where?: PostWhereInput, orderBy?: PostOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<PostConnection>
   usersConnection: (args: { where?: UserWhereInput, orderBy?: UserOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<UserConnection>
   animalsConnection: (args: { where?: AnimalWhereInput, orderBy?: AnimalOrderByInput, skip?: Int, after?: String, before?: String, first?: Int, last?: Int }, info?: GraphQLResolveInfo | string) => Promise<AnimalConnection>
@@ -1836,14 +2063,17 @@ export type Mutation = {
   updateUser: (args: { data: UserUpdateInput, where: UserWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<User | null>
   updateAnimal: (args: { data: AnimalUpdateInput, where: AnimalWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Animal | null>
   updateChannel: (args: { data: ChannelUpdateInput, where: ChannelWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Channel | null>
+  updateChannelMember: (args: { data: ChannelMemberUpdateInput, where: ChannelMemberWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<ChannelMember | null>
   deletePost: (args: { where: PostWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Post | null>
   deleteUser: (args: { where: UserWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<User | null>
   deleteAnimal: (args: { where: AnimalWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Animal | null>
   deleteChannel: (args: { where: ChannelWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<Channel | null>
+  deleteChannelMember: (args: { where: ChannelMemberWhereUniqueInput }, info?: GraphQLResolveInfo | string) => Promise<ChannelMember | null>
   upsertPost: (args: { where: PostWhereUniqueInput, create: PostCreateInput, update: PostUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Post>
   upsertUser: (args: { where: UserWhereUniqueInput, create: UserCreateInput, update: UserUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<User>
   upsertAnimal: (args: { where: AnimalWhereUniqueInput, create: AnimalCreateInput, update: AnimalUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Animal>
   upsertChannel: (args: { where: ChannelWhereUniqueInput, create: ChannelCreateInput, update: ChannelUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<Channel>
+  upsertChannelMember: (args: { where: ChannelMemberWhereUniqueInput, create: ChannelMemberCreateInput, update: ChannelMemberUpdateInput }, info?: GraphQLResolveInfo | string) => Promise<ChannelMember>
   updateManyPosts: (args: { data: PostUpdateInput, where: PostWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   updateManyUsers: (args: { data: UserUpdateInput, where: UserWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
   updateManyAnimals: (args: { data: AnimalUpdateInput, where: AnimalWhereInput }, info?: GraphQLResolveInfo | string) => Promise<BatchPayload>
@@ -1888,6 +2118,7 @@ export class Prisma extends BasePrisma {
     user: (args, info): Promise<User | null> => super.delegate('query', 'user', args, {}, info),
     animal: (args, info): Promise<Animal | null> => super.delegate('query', 'animal', args, {}, info),
     channel: (args, info): Promise<Channel | null> => super.delegate('query', 'channel', args, {}, info),
+    channelMember: (args, info): Promise<ChannelMember | null> => super.delegate('query', 'channelMember', args, {}, info),
     postsConnection: (args, info): Promise<PostConnection> => super.delegate('query', 'postsConnection', args, {}, info),
     usersConnection: (args, info): Promise<UserConnection> => super.delegate('query', 'usersConnection', args, {}, info),
     animalsConnection: (args, info): Promise<AnimalConnection> => super.delegate('query', 'animalsConnection', args, {}, info),
@@ -1906,14 +2137,17 @@ export class Prisma extends BasePrisma {
     updateUser: (args, info): Promise<User | null> => super.delegate('mutation', 'updateUser', args, {}, info),
     updateAnimal: (args, info): Promise<Animal | null> => super.delegate('mutation', 'updateAnimal', args, {}, info),
     updateChannel: (args, info): Promise<Channel | null> => super.delegate('mutation', 'updateChannel', args, {}, info),
+    updateChannelMember: (args, info): Promise<ChannelMember | null> => super.delegate('mutation', 'updateChannelMember', args, {}, info),
     deletePost: (args, info): Promise<Post | null> => super.delegate('mutation', 'deletePost', args, {}, info),
     deleteUser: (args, info): Promise<User | null> => super.delegate('mutation', 'deleteUser', args, {}, info),
     deleteAnimal: (args, info): Promise<Animal | null> => super.delegate('mutation', 'deleteAnimal', args, {}, info),
     deleteChannel: (args, info): Promise<Channel | null> => super.delegate('mutation', 'deleteChannel', args, {}, info),
+    deleteChannelMember: (args, info): Promise<ChannelMember | null> => super.delegate('mutation', 'deleteChannelMember', args, {}, info),
     upsertPost: (args, info): Promise<Post> => super.delegate('mutation', 'upsertPost', args, {}, info),
     upsertUser: (args, info): Promise<User> => super.delegate('mutation', 'upsertUser', args, {}, info),
     upsertAnimal: (args, info): Promise<Animal> => super.delegate('mutation', 'upsertAnimal', args, {}, info),
     upsertChannel: (args, info): Promise<Channel> => super.delegate('mutation', 'upsertChannel', args, {}, info),
+    upsertChannelMember: (args, info): Promise<ChannelMember> => super.delegate('mutation', 'upsertChannelMember', args, {}, info),
     updateManyPosts: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyPosts', args, {}, info),
     updateManyUsers: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyUsers', args, {}, info),
     updateManyAnimals: (args, info): Promise<BatchPayload> => super.delegate('mutation', 'updateManyAnimals', args, {}, info),
