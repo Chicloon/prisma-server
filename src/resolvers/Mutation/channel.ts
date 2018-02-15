@@ -10,10 +10,7 @@ export const channel = {
     const channel = await ctx.db.mutation.createChannel(
       {
         data: {
-          ...args,
-          owner: {
-            connect: { id: userId }
-          }
+          ...args
         }
       },
       info
@@ -21,7 +18,7 @@ export const channel = {
     console.log(channel);
     await ctx.db.mutation.createChannelMember({
       data: {
-        name: {
+        member: {
           connect: { id: userId }
         },
         channel: {
