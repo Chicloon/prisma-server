@@ -2,6 +2,8 @@ import { getUserId, Context } from "../utils";
 
 export const Query = {
   channels(parent, { id }, ctx: Context, info) {
+    // const id = getUserId(ctx);
+    // console.log("============ id", id);
     return ctx.db.query.channels({}, info);
   },
   user(parent, { id }, ctx: Context, info) {
