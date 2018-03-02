@@ -75,8 +75,17 @@ type AggregateUser {
   count: Int!
 }
 
+"""
+A connection to a list of items.
+"""
 type AnimalConnection {
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
   edges: [AnimalEdge]!
   aggregate: AggregateAnimal!
 }
@@ -99,8 +108,17 @@ input AnimalCreateWithoutOwnersInput {
   legs: Int!
 }
 
+"""
+An edge in a connection.
+"""
 type AnimalEdge {
+  """
+  The item at the end of the edge.
+  """
   node: Animal!
+  """
+  A cursor for use in pagination.
+  """
   cursor: String!
 }
 
@@ -134,11 +152,29 @@ type AnimalSubscriptionPayload {
 }
 
 input AnimalSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [AnimalSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [AnimalSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
   mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
   updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
   updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
   updatedFields_contains_some: [String!]
   node: AnimalWhereInput
 }
@@ -177,45 +213,153 @@ input AnimalUpsertWithoutOwnersInput {
 }
 
 input AnimalWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [AnimalWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [AnimalWhereInput!]
   id: ID
+  """
+  All values that are not equal to given value.
+  """
   id_not: ID
+  """
+  All values that are contained in given list.
+  """
   id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
   id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
   id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
   id_lte: ID
+  """
+  All values greater than the given value.
+  """
   id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
   id_gte: ID
+  """
+  All values containing the given string.
+  """
   id_contains: ID
+  """
+  All values not containing the given string.
+  """
   id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
   id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
   id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
   id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
   id_not_ends_with: ID
   name: String
+  """
+  All values that are not equal to given value.
+  """
   name_not: String
+  """
+  All values that are contained in given list.
+  """
   name_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   name_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   name_lt: String
+  """
+  All values less than or equal the given value.
+  """
   name_lte: String
+  """
+  All values greater than the given value.
+  """
   name_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   name_gte: String
+  """
+  All values containing the given string.
+  """
   name_contains: String
+  """
+  All values not containing the given string.
+  """
   name_not_contains: String
+  """
+  All values starting with the given string.
+  """
   name_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   name_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   name_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   name_not_ends_with: String
   tail: Boolean
+  """
+  All values that are not equal to given value.
+  """
   tail_not: Boolean
   legs: Int
+  """
+  All values that are not equal to given value.
+  """
   legs_not: Int
+  """
+  All values that are contained in given list.
+  """
   legs_in: [Int!]
+  """
+  All values that are not contained in given list.
+  """
   legs_not_in: [Int!]
+  """
+  All values less than the given value.
+  """
   legs_lt: Int
+  """
+  All values less than or equal the given value.
+  """
   legs_lte: Int
+  """
+  All values greater than the given value.
+  """
   legs_gt: Int
+  """
+  All values greater than or equal the given value.
+  """
   legs_gte: Int
   owners: UserWhereInput
 }
@@ -226,11 +370,23 @@ input AnimalWhereUniqueInput {
 }
 
 type BatchPayload {
+  """
+  The number of nodes that have been affected by the Batch operation.
+  """
   count: Long!
 }
 
+"""
+A connection to a list of items.
+"""
 type ChannelConnection {
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
   edges: [ChannelEdge]!
   aggregate: AggregateChannel!
 }
@@ -249,13 +405,31 @@ input ChannelCreateWithoutMembersInput {
   name: String!
 }
 
+"""
+An edge in a connection.
+"""
 type ChannelEdge {
+  """
+  The item at the end of the edge.
+  """
   node: Channel!
+  """
+  A cursor for use in pagination.
+  """
   cursor: String!
 }
 
+"""
+A connection to a list of items.
+"""
 type ChannelMemberConnection {
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
   edges: [ChannelMemberEdge]!
   aggregate: AggregateChannelMember!
 }
@@ -286,8 +460,17 @@ input ChannelMemberCreateWithoutMemberInput {
   channel: ChannelCreateOneWithoutMembersInput!
 }
 
+"""
+An edge in a connection.
+"""
 type ChannelMemberEdge {
+  """
+  The item at the end of the edge.
+  """
   node: ChannelMember!
+  """
+  A cursor for use in pagination.
+  """
   cursor: String!
 }
 
@@ -315,11 +498,29 @@ type ChannelMemberSubscriptionPayload {
 }
 
 input ChannelMemberSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [ChannelMemberSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [ChannelMemberSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
   mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
   updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
   updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
   updatedFields_contains_some: [String!]
   node: ChannelMemberWhereInput
 }
@@ -381,35 +582,119 @@ input ChannelMemberUpsertWithoutMemberInput {
 }
 
 input ChannelMemberWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [ChannelMemberWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [ChannelMemberWhereInput!]
   id: ID
+  """
+  All values that are not equal to given value.
+  """
   id_not: ID
+  """
+  All values that are contained in given list.
+  """
   id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
   id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
   id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
   id_lte: ID
+  """
+  All values greater than the given value.
+  """
   id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
   id_gte: ID
+  """
+  All values containing the given string.
+  """
   id_contains: ID
+  """
+  All values not containing the given string.
+  """
   id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
   id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
   id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
   id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
   id_not_ends_with: ID
   role: String
+  """
+  All values that are not equal to given value.
+  """
   role_not: String
+  """
+  All values that are contained in given list.
+  """
   role_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   role_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   role_lt: String
+  """
+  All values less than or equal the given value.
+  """
   role_lte: String
+  """
+  All values greater than the given value.
+  """
   role_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   role_gte: String
+  """
+  All values containing the given string.
+  """
   role_contains: String
+  """
+  All values not containing the given string.
+  """
   role_not_contains: String
+  """
+  All values starting with the given string.
+  """
   role_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   role_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   role_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   role_not_ends_with: String
   member: UserWhereInput
   channel: ChannelWhereInput
@@ -443,11 +728,29 @@ type ChannelSubscriptionPayload {
 }
 
 input ChannelSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [ChannelSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [ChannelSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
   mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
   updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
   updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
   updatedFields_contains_some: [String!]
   node: ChannelWhereInput
 }
@@ -482,35 +785,119 @@ input ChannelUpsertWithoutMembersInput {
 }
 
 input ChannelWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [ChannelWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [ChannelWhereInput!]
   id: ID
+  """
+  All values that are not equal to given value.
+  """
   id_not: ID
+  """
+  All values that are contained in given list.
+  """
   id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
   id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
   id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
   id_lte: ID
+  """
+  All values greater than the given value.
+  """
   id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
   id_gte: ID
+  """
+  All values containing the given string.
+  """
   id_contains: ID
+  """
+  All values not containing the given string.
+  """
   id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
   id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
   id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
   id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
   id_not_ends_with: ID
   name: String
+  """
+  All values that are not equal to given value.
+  """
   name_not: String
+  """
+  All values that are contained in given list.
+  """
   name_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   name_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   name_lt: String
+  """
+  All values less than or equal the given value.
+  """
   name_lte: String
+  """
+  All values greater than the given value.
+  """
   name_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   name_gte: String
+  """
+  All values containing the given string.
+  """
   name_contains: String
+  """
+  All values not containing the given string.
+  """
   name_not_contains: String
+  """
+  All values starting with the given string.
+  """
   name_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   name_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   name_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   name_not_ends_with: String
   members_every: ChannelMemberWhereInput
   members_some: ChannelMemberWhereInput
@@ -524,6 +911,10 @@ input ChannelWhereUniqueInput {
 
 scalar DateTime
 
+"""
+The Long scalar type represents non-fractional signed whole numeric values.
+Long can represent values between -(2^63) and 2^63 - 1.
+"""
 scalar Long
 
 type Mutation {
@@ -565,19 +956,49 @@ enum MutationType {
   DELETED
 }
 
+"""
+An object with an ID
+"""
 interface Node {
+  """
+  The id of the object.
+  """
   id: ID!
 }
 
+"""
+Information about pagination in a connection.
+"""
 type PageInfo {
+  """
+  When paginating forwards, are there more items?
+  """
   hasNextPage: Boolean!
+  """
+  When paginating backwards, are there more items?
+  """
   hasPreviousPage: Boolean!
+  """
+  When paginating backwards, the cursor to continue.
+  """
   startCursor: String
+  """
+  When paginating forwards, the cursor to continue.
+  """
   endCursor: String
 }
 
+"""
+A connection to a list of items.
+"""
 type PostConnection {
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
   edges: [PostEdge]!
   aggregate: AggregatePost!
 }
@@ -600,8 +1021,17 @@ input PostCreateWithoutAuthorInput {
   text: String!
 }
 
+"""
+An edge in a connection.
+"""
 type PostEdge {
+  """
+  The item at the end of the edge.
+  """
   node: Post!
+  """
+  A cursor for use in pagination.
+  """
   cursor: String!
 }
 
@@ -637,11 +1067,29 @@ type PostSubscriptionPayload {
 }
 
 input PostSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [PostSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [PostSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
   mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
   updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
   updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
   updatedFields_contains_some: [String!]
   node: PostWhereInput
 }
@@ -680,67 +1128,235 @@ input PostUpsertWithoutAuthorInput {
 }
 
 input PostWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [PostWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [PostWhereInput!]
   id: ID
+  """
+  All values that are not equal to given value.
+  """
   id_not: ID
+  """
+  All values that are contained in given list.
+  """
   id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
   id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
   id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
   id_lte: ID
+  """
+  All values greater than the given value.
+  """
   id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
   id_gte: ID
+  """
+  All values containing the given string.
+  """
   id_contains: ID
+  """
+  All values not containing the given string.
+  """
   id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
   id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
   id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
   id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
   id_not_ends_with: ID
   createdAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
   createdAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
   createdAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
   createdAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
   createdAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
   createdAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
   createdAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
   createdAt_gte: DateTime
   updatedAt: DateTime
+  """
+  All values that are not equal to given value.
+  """
   updatedAt_not: DateTime
+  """
+  All values that are contained in given list.
+  """
   updatedAt_in: [DateTime!]
+  """
+  All values that are not contained in given list.
+  """
   updatedAt_not_in: [DateTime!]
+  """
+  All values less than the given value.
+  """
   updatedAt_lt: DateTime
+  """
+  All values less than or equal the given value.
+  """
   updatedAt_lte: DateTime
+  """
+  All values greater than the given value.
+  """
   updatedAt_gt: DateTime
+  """
+  All values greater than or equal the given value.
+  """
   updatedAt_gte: DateTime
   isPublished: Boolean
+  """
+  All values that are not equal to given value.
+  """
   isPublished_not: Boolean
   title: String
+  """
+  All values that are not equal to given value.
+  """
   title_not: String
+  """
+  All values that are contained in given list.
+  """
   title_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   title_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   title_lt: String
+  """
+  All values less than or equal the given value.
+  """
   title_lte: String
+  """
+  All values greater than the given value.
+  """
   title_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   title_gte: String
+  """
+  All values containing the given string.
+  """
   title_contains: String
+  """
+  All values not containing the given string.
+  """
   title_not_contains: String
+  """
+  All values starting with the given string.
+  """
   title_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   title_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   title_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   title_not_ends_with: String
   text: String
+  """
+  All values that are not equal to given value.
+  """
   text_not: String
+  """
+  All values that are contained in given list.
+  """
   text_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   text_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   text_lt: String
+  """
+  All values less than or equal the given value.
+  """
   text_lte: String
+  """
+  All values greater than the given value.
+  """
   text_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   text_gte: String
+  """
+  All values containing the given string.
+  """
   text_contains: String
+  """
+  All values not containing the given string.
+  """
   text_not_contains: String
+  """
+  All values starting with the given string.
+  """
   text_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   text_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   text_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   text_not_ends_with: String
   author: UserWhereInput
 }
@@ -765,7 +1381,13 @@ type Query {
   animalsConnection(where: AnimalWhereInput, orderBy: AnimalOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): AnimalConnection!
   channelsConnection(where: ChannelWhereInput, orderBy: ChannelOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ChannelConnection!
   channelMembersConnection(where: ChannelMemberWhereInput, orderBy: ChannelMemberOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ChannelMemberConnection!
-  node(id: ID!): Node
+  """
+  Fetches an object given its ID
+  """
+  node("""
+  The ID of an object
+  """
+  id: ID!): Node
 }
 
 type Subscription {
@@ -776,8 +1398,17 @@ type Subscription {
   channelMember(where: ChannelMemberSubscriptionWhereInput): ChannelMemberSubscriptionPayload
 }
 
+"""
+A connection to a list of items.
+"""
 type UserConnection {
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
+  """
+  A list of edges.
+  """
   edges: [UserEdge]!
   aggregate: AggregateUser!
 }
@@ -830,8 +1461,17 @@ input UserCreateWithoutPostsInput {
   channels: ChannelMemberCreateManyWithoutMemberInput
 }
 
+"""
+An edge in a connection.
+"""
 type UserEdge {
+  """
+  The item at the end of the edge.
+  """
   node: User!
+  """
+  A cursor for use in pagination.
+  """
   cursor: String!
 }
 
@@ -865,11 +1505,29 @@ type UserSubscriptionPayload {
 }
 
 input UserSubscriptionWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [UserSubscriptionWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [UserSubscriptionWhereInput!]
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
   mutation_in: [MutationType!]
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
   updatedFields_contains: String
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
   updatedFields_contains_every: [String!]
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
   updatedFields_contains_some: [String!]
   node: UserWhereInput
 }
@@ -968,63 +1626,225 @@ input UserUpsertWithoutPostsInput {
 }
 
 input UserWhereInput {
+  """
+  Logical AND on all given filters.
+  """
   AND: [UserWhereInput!]
+  """
+  Logical OR on all given filters.
+  """
   OR: [UserWhereInput!]
   id: ID
+  """
+  All values that are not equal to given value.
+  """
   id_not: ID
+  """
+  All values that are contained in given list.
+  """
   id_in: [ID!]
+  """
+  All values that are not contained in given list.
+  """
   id_not_in: [ID!]
+  """
+  All values less than the given value.
+  """
   id_lt: ID
+  """
+  All values less than or equal the given value.
+  """
   id_lte: ID
+  """
+  All values greater than the given value.
+  """
   id_gt: ID
+  """
+  All values greater than or equal the given value.
+  """
   id_gte: ID
+  """
+  All values containing the given string.
+  """
   id_contains: ID
+  """
+  All values not containing the given string.
+  """
   id_not_contains: ID
+  """
+  All values starting with the given string.
+  """
   id_starts_with: ID
+  """
+  All values not starting with the given string.
+  """
   id_not_starts_with: ID
+  """
+  All values ending with the given string.
+  """
   id_ends_with: ID
+  """
+  All values not ending with the given string.
+  """
   id_not_ends_with: ID
   email: String
+  """
+  All values that are not equal to given value.
+  """
   email_not: String
+  """
+  All values that are contained in given list.
+  """
   email_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   email_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   email_lt: String
+  """
+  All values less than or equal the given value.
+  """
   email_lte: String
+  """
+  All values greater than the given value.
+  """
   email_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   email_gte: String
+  """
+  All values containing the given string.
+  """
   email_contains: String
+  """
+  All values not containing the given string.
+  """
   email_not_contains: String
+  """
+  All values starting with the given string.
+  """
   email_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   email_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   email_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   email_not_ends_with: String
   password: String
+  """
+  All values that are not equal to given value.
+  """
   password_not: String
+  """
+  All values that are contained in given list.
+  """
   password_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   password_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   password_lt: String
+  """
+  All values less than or equal the given value.
+  """
   password_lte: String
+  """
+  All values greater than the given value.
+  """
   password_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   password_gte: String
+  """
+  All values containing the given string.
+  """
   password_contains: String
+  """
+  All values not containing the given string.
+  """
   password_not_contains: String
+  """
+  All values starting with the given string.
+  """
   password_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   password_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   password_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   password_not_ends_with: String
   name: String
+  """
+  All values that are not equal to given value.
+  """
   name_not: String
+  """
+  All values that are contained in given list.
+  """
   name_in: [String!]
+  """
+  All values that are not contained in given list.
+  """
   name_not_in: [String!]
+  """
+  All values less than the given value.
+  """
   name_lt: String
+  """
+  All values less than or equal the given value.
+  """
   name_lte: String
+  """
+  All values greater than the given value.
+  """
   name_gt: String
+  """
+  All values greater than or equal the given value.
+  """
   name_gte: String
+  """
+  All values containing the given string.
+  """
   name_contains: String
+  """
+  All values not containing the given string.
+  """
   name_not_contains: String
+  """
+  All values starting with the given string.
+  """
   name_starts_with: String
+  """
+  All values not starting with the given string.
+  """
   name_not_starts_with: String
+  """
+  All values ending with the given string.
+  """
   name_ends_with: String
+  """
+  All values not ending with the given string.
+  """
   name_not_ends_with: String
   posts_every: PostWhereInput
   posts_some: PostWhereInput
@@ -1804,6 +2624,10 @@ export interface UserCreateWithoutPostsInput {
   channels?: ChannelMemberCreateManyWithoutMemberInput
 }
 
+/*
+ * An object with an ID
+
+ */
 export interface Node {
   id: ID_Output
 }
@@ -1813,6 +2637,10 @@ export interface ChannelMemberPreviousValues {
   role: String
 }
 
+/*
+ * Information about pagination in a connection.
+
+ */
 export interface PageInfo {
   hasNextPage: Boolean
   hasPreviousPage: Boolean
@@ -1828,6 +2656,10 @@ export interface Animal extends Node {
   owners: User
 }
 
+/*
+ * A connection to a list of items.
+
+ */
 export interface PostConnection {
   pageInfo: PageInfo
   edges: PostEdge[]
@@ -1851,6 +2683,10 @@ export interface ChannelMemberSubscriptionPayload {
   previousValues?: ChannelMemberPreviousValues
 }
 
+/*
+ * An edge in a connection.
+
+ */
 export interface ChannelMemberEdge {
   node: ChannelMember
   cursor: String
@@ -1874,6 +2710,10 @@ export interface User extends Node {
   channels?: ChannelMember[]
 }
 
+/*
+ * A connection to a list of items.
+
+ */
 export interface ChannelConnection {
   pageInfo: PageInfo
   edges: ChannelEdge[]
@@ -1885,6 +2725,10 @@ export interface ChannelPreviousValues {
   name: String
 }
 
+/*
+ * An edge in a connection.
+
+ */
 export interface AnimalEdge {
   node: Animal
   cursor: String
@@ -1908,6 +2752,10 @@ export interface PostSubscriptionPayload {
   previousValues?: PostPreviousValues
 }
 
+/*
+ * A connection to a list of items.
+
+ */
 export interface UserConnection {
   pageInfo: PageInfo
   edges: UserEdge[]
@@ -1923,6 +2771,10 @@ export interface PostPreviousValues {
   text: String
 }
 
+/*
+ * An edge in a connection.
+
+ */
 export interface PostEdge {
   node: Post
   cursor: String
@@ -1934,6 +2786,10 @@ export interface Channel extends Node {
   members?: ChannelMember[]
 }
 
+/*
+ * A connection to a list of items.
+
+ */
 export interface ChannelMemberConnection {
   pageInfo: PageInfo
   edges: ChannelMemberEdge[]
@@ -1951,6 +2807,10 @@ export interface AggregateAnimal {
   count: Int
 }
 
+/*
+ * An edge in a connection.
+
+ */
 export interface UserEdge {
   node: User
   cursor: String
@@ -1988,12 +2848,20 @@ export interface AggregatePost {
   count: Int
 }
 
+/*
+ * A connection to a list of items.
+
+ */
 export interface AnimalConnection {
   pageInfo: PageInfo
   edges: AnimalEdge[]
   aggregate: AggregateAnimal
 }
 
+/*
+ * An edge in a connection.
+
+ */
 export interface ChannelEdge {
   node: Channel
   cursor: String
@@ -2019,6 +2887,10 @@ The `ID` scalar type represents a unique identifier, often used to refetch an ob
 export type ID_Input = string | number
 export type ID_Output = string
 
+/*
+The `Long` scalar type represents non-fractional signed whole numeric values.
+Long can represent values between -(2^63) and 2^63 - 1.
+*/
 export type Long = string
 
 /*
